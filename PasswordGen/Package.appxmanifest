@@ -9,13 +9,13 @@
   <Identity
     Name="e44ef05c-d9b6-4896-bdab-567aa6a2ee50"
     Publisher="CN=jafge"
-    Version="1.0.0.0" />
+    Version="2.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="e44ef05c-d9b6-4896-bdab-567aa6a2ee50" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>PasswordGen</DisplayName>
-    <PublisherDisplayName>jafge</PublisherDisplayName>
+    <PublisherDisplayName>Johnny Gérard</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -35,15 +35,11 @@
         DisplayName="PasswordGen"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="PasswordGen"
+        Description="Password generator"
         BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
     </Application>
   </Applications>
-
-  <Capabilities>
-    <Capability Name="internetClient" />
-  </Capabilities>
 </Package>
