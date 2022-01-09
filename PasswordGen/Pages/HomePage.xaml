@@ -7,8 +7,98 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     NavigationCacheMode="Required">
+    <ScrollViewer>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="720"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <!-- MiddleRow (2) -->
+                        <Setter Target="PasswordPanel.(Grid.Row)" Value="2"/>
+                        <Setter Target="SwitchPanel.(Grid.Row)" Value="2"/>
+                        <Setter Target="MiddleRow.MinHeight" Value="0"/>
+                        <Setter Target="MiddleRow.MaxHeight" Value="Infinity"/>
 
-    <Grid>
+                        <!-- Collapse every other row -->
+                        <Setter Target="TopGutter.Height" Value="0"/>
+                        <Setter Target="TopRow.Height" Value="0"/>
+                        <Setter Target="BottomRow.Height" Value="0"/>
+                        <Setter Target="BottomGutter.Height" Value="0"/>
 
-    </Grid>
+                        <!-- Left (1) and right (3) columns -->
+                        <Setter Target="PasswordPanel.(Grid.Column)" Value="1"/>
+                        <Setter Target="SwitchPanel.(Grid.Column)" Value="3"/>
+                        <Setter Target="LeftColumn.Width" Value="Auto"/>
+                        <Setter Target="RightColumn.Width" Value="Auto"/>
+
+                        <!-- Remaining space is distributed equally between Gutters and MiddleColumn -->
+                        <Setter Target="LeftGutter.Width" Value="1*"/>
+                        <Setter Target="RightGutter.Width" Value="1*"/>
+                        <Setter Target="MiddleColumn.MinWidth" Value="100"/>
+                        <Setter Target="MiddleColumn.MaxWidth" Value="300"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Grid Padding="32">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="LeftGutter" Width="0"/>
+                <ColumnDefinition x:Name="LeftColumn" Width="0"/>
+                <ColumnDefinition x:Name="MiddleColumn"/>
+                <ColumnDefinition x:Name="RightColumn" Width="0"/>
+                <ColumnDefinition x:Name="RightGutter" Width="0"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition x:Name="TopGutter"/>
+                <RowDefinition x:Name="TopRow" Height="Auto"/>
+                <RowDefinition x:Name="MiddleRow" MinHeight="40" MaxHeight="120"/>
+                <RowDefinition x:Name="BottomRow" Height="Auto"/>
+                <RowDefinition x:Name="BottomGutter"/>
+            </Grid.RowDefinitions>
+            <StackPanel x:Name="PasswordPanel" Grid.Column="2" Grid.Row="1"
+                HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock
+                    x:Name="PasswordTextBlock"
+                    Text="pI9wftYnd7,r751a"
+                    HorizontalAlignment="Center"
+                    FontFamily="Consolas"
+                    FontSize="{x:Bind Copy_Button.FontSize}"/>
+                <StackPanel Orientation="Horizontal" Margin="0,32,0,40" HorizontalAlignment="Center">
+                    <Button Click="Copy_Button_Click" CornerRadius="4,0,0,4" x:Name="Copy_Button">Copy</Button>
+                    <Button Click="RefreshButton_Click" CornerRadius="0,4,4,0" Height="32" ToolTipService.ToolTip="Refresh password">
+                        <FontIcon FontFamily="Segoe Fluent Icons" FontSize="{x:Bind Copy_Button.FontSize}" Glyph="&#xE72C;"/>
+                    </Button>
+                </StackPanel>
+                <Slider
+                    x:Name="LengthSlider"
+                    Maximum="28"
+                    Minimum="4"
+                    Header="Length"
+                    Width="300"/>
+            </StackPanel>
+            <Grid x:Name="SwitchPanel" Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <ToggleSwitch Grid.Row="0" Grid.Column="0" x:Name="DigitSwitch" Header="Digits"/>
+                <ToggleSwitch Grid.Row="1" Grid.Column="0" x:Name="SymbolSwitch" Header="Symbols"/>
+                <ToggleSwitch Grid.Row="0" Grid.Column="1" x:Name="LowercaseSwitch" Header="Lowercase" MinWidth="0"/>
+                <ToggleSwitch Grid.Row="1" Grid.Column="1" x:Name="UppercaseSwitch" Header="Uppercase" MinWidth="0"/>
+                <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,32,0,0">
+                    <Button Click="ResetButton_Click" CornerRadius="4,0,0,4">Reset</Button>
+                    <Button Click="SaveSettings_Click" CornerRadius="0,4,4,0"  Height="32" ToolTipService.ToolTip="Set current settings as default">
+                        <FontIcon FontFamily="Segoe Fluent Icons" FontSize="{x:Bind Copy_Button.FontSize}" Glyph="&#xE105;"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
 </Page>
