@@ -1,30 +1,77 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
-
-namespace PasswordGen
+﻿namespace PasswordGen
 {
+    using System;
+
+    using Windows.ApplicationModel;
+    using Windows.ApplicationModel.Core;
+    using Windows.UI.ViewManagement;
+    using Windows.UI.Xaml;
+    using Windows.UI.Xaml.Controls;
+
+    using MUXC = Microsoft.UI.Xaml.Controls;
+
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private readonly MUXC.NavigationViewItem _startPage;
+        private readonly string _displayName = Package.Current.DisplayName;
+
         public MainPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
+            _startPage = HomePage;
+
+            ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
+            titleBar.ButtonBackgroundColor = Windows.UI.Colors.Transparent;
+
+            // Hide default title bar.
+            CoreApplicationViewTitleBar coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
+            coreTitleBar.ExtendViewIntoTitleBar = true;
+            UpdateTitleBarLayout(coreTitleBar);
+
+            // Set XAML element as a draggable region.
+            Window.Current.SetTitleBar(AppTitleBar);
+
+            // Register a handler for when the size of the overlaid caption control changes.
+            // For example, when the app moves to a screen with a different DPI.
+            coreTitleBar.LayoutMetricsChanged += CoreTitleBar_LayoutMetricsChanged;
+
+            // Register a handler for when the title bar visibility changes.
+            // For example, when the title bar is invoked in full screen mode.
+            coreTitleBar.IsVisibleChanged += CoreTitleBar_IsVisibleChanged;
+        }
+
+        private void CoreTitleBar_LayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
+            => UpdateTitleBarLayout(sender);
+
+        private void UpdateTitleBarLayout(CoreApplicationViewTitleBar coreTitleBar)
+        {
+            // Get the size of the caption controls area and back button 
+            // (returned in logical pixels), and move your content around as necessary.
+            LeftPaddingColumn.Width = new GridLength(coreTitleBar.SystemOverlayLeftInset);
+            RightPaddingColumn.Width = new GridLength(coreTitleBar.SystemOverlayRightInset);
+
+            // Update title bar control size as needed to account for system size changes.
+            AppTitleBar.Height = coreTitleBar.Height;
+        }
+
+        private void CoreTitleBar_IsVisibleChanged(CoreApplicationViewTitleBar sender, object args)
+            => AppTitleBar.Visibility = sender.IsVisible ? Visibility.Visible : Visibility.Collapsed;
+
+        private void NavigationView_Loaded(object sender, RoutedEventArgs e)
+            => ((MUXC.NavigationView) sender).SelectedItem = _startPage;
+
+        private void NavigationView_SelectionChanged(MUXC.NavigationView sender, MUXC.NavigationViewSelectionChangedEventArgs args)
+        {
+            var selectedItem = (MUXC.NavigationViewItem) args.SelectedItem;
+            Type sourcePageType =
+                args.IsSettingsSelected
+                ? typeof(Pages.SettingsPage)
+                : Type.GetType($"PasswordGen.Pages.{selectedItem.Name}");
+
+            MainFrame.Navigate(sourcePageType, null, args.RecommendedNavigationTransitionInfo);
         }
     }
 }
