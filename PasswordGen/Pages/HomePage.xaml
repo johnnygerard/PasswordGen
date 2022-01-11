@@ -3,10 +3,12 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:PasswordGen.Pages"
+    xmlns:util="using:PasswordGen.Utilities"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    NavigationCacheMode="Required">
+    NavigationCacheMode="Required"
+    Loaded="Page_Loaded">
     <ScrollViewer>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
@@ -64,16 +66,17 @@
                     Text="pI9wftYnd7,r751a"
                     HorizontalAlignment="Center"
                     FontFamily="Consolas"
-                    FontSize="{x:Bind Copy_Button.FontSize}"/>
+                    FontSize="{x:Bind CopyButton.FontSize}"/>
                 <StackPanel Orientation="Horizontal" Margin="0,32,0,40" HorizontalAlignment="Center">
-                    <Button Click="Copy_Button_Click" CornerRadius="4,0,0,4" x:Name="Copy_Button">Copy</Button>
+                    <Button Click="CopyButton_Click" CornerRadius="4,0,0,4" x:Name="CopyButton">Copy</Button>
                     <Button Click="RefreshButton_Click" CornerRadius="0,4,4,0" Height="32" ToolTipService.ToolTip="Refresh password">
-                        <FontIcon FontFamily="Segoe Fluent Icons" FontSize="{x:Bind Copy_Button.FontSize}" Glyph="&#xE72C;"/>
+                        <FontIcon FontFamily="Segoe Fluent Icons" FontSize="{x:Bind CopyButton.FontSize}" Glyph="&#xE72C;"/>
                     </Button>
                 </StackPanel>
                 <Slider
-                    x:Name="LengthSlider"
+                    x:Name="PasswordLengthSlider"
                     Maximum="28"
+                    Value="16"
                     Minimum="4"
                     Header="Length"
                     Width="300"/>
@@ -88,14 +91,14 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <ToggleSwitch Grid.Row="0" Grid.Column="0" x:Name="DigitSwitch" Header="Digits"/>
-                <ToggleSwitch Grid.Row="1" Grid.Column="0" x:Name="SymbolSwitch" Header="Symbols"/>
-                <ToggleSwitch Grid.Row="0" Grid.Column="1" x:Name="LowercaseSwitch" Header="Lowercase" MinWidth="0"/>
-                <ToggleSwitch Grid.Row="1" Grid.Column="1" x:Name="UppercaseSwitch" Header="Uppercase" MinWidth="0"/>
+                <ToggleSwitch Grid.Row="0" Grid.Column="0" IsOn="True" Tag="{x:Bind util:Charsets.DIGITS}" x:Name="DigitSwitch" Header="Digits"/>
+                <ToggleSwitch Grid.Row="1" Grid.Column="0" IsOn="True" Tag="{x:Bind util:Charsets.SYMBOLS}" x:Name="SymbolSwitch" Header="Symbols"/>
+                <ToggleSwitch Grid.Row="0" Grid.Column="1" IsOn="True" Tag="{x:Bind util:Charsets.LOWERCASE}" x:Name="LowercaseSwitch" Header="Lowercase" MinWidth="0"/>
+                <ToggleSwitch Grid.Row="1" Grid.Column="1" IsOn="True" Tag="{x:Bind util:Charsets.UPPERCASE}" x:Name="UppercaseSwitch" Header="Uppercase" MinWidth="0"/>
                 <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,32,0,0">
                     <Button Click="ResetButton_Click" CornerRadius="4,0,0,4">Reset</Button>
                     <Button Click="SaveSettings_Click" CornerRadius="0,4,4,0"  Height="32" ToolTipService.ToolTip="Set current settings as default">
-                        <FontIcon FontFamily="Segoe Fluent Icons" FontSize="{x:Bind Copy_Button.FontSize}" Glyph="&#xE105;"/>
+                        <FontIcon FontFamily="Segoe Fluent Icons" FontSize="{x:Bind CopyButton.FontSize}" Glyph="&#xE105;"/>
                     </Button>
                 </StackPanel>
             </Grid>
