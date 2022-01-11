@@ -4,12 +4,12 @@
 
     internal class PasswordDataEntry
     {
-        internal IEnumerable<char> CharSet { get; set; }
+        internal IEnumerable<char> Charset { get; set; }
         internal int Length { get; set; }
 
-        internal PasswordDataEntry(IEnumerable<char> charSet, int length)
+        internal PasswordDataEntry(IEnumerable<char> charset, int length)
         {
-            CharSet = charSet;
+            Charset = charset;
             Length = length;
         }
     }

@@ -18,11 +18,11 @@
 
             foreach (var passwordDataEntry in passwordData)
             {
-                IEnumerable<char> charSet = passwordDataEntry.CharSet;
-                int charSetCount = charSet.Count();
+                IEnumerable<char> charset = passwordDataEntry.Charset;
+                int charsetCount = charset.Count();
 
                 for (int i = 0; i < passwordDataEntry.Length; i++)
-                    password[passwordIndex++] = charSet.ElementAt(GetRandomInt(charSetCount));
+                    password[passwordIndex++] = charset.ElementAt(GetRandomInt(charsetCount));
             }
 
             Shuffle(password);
