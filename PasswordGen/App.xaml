@@ -29,7 +29,10 @@
                     </ResourceDictionary.ThemeDictionaries>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
-            
+            <x:String x:Key="DIGITS_NAME">Digits</x:String>
+            <x:String x:Key="SYMBOLS_NAME">Symbols</x:String>
+            <x:String x:Key="LOWERCASE_NAME">Small letters</x:String>
+            <x:String x:Key="UPPERCASE_NAME">Capital letters</x:String>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
