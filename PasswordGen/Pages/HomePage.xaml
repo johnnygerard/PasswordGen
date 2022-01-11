@@ -14,7 +14,7 @@
             <VisualStateGroup>
                 <VisualState>
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="720"/>
+                        <AdaptiveTrigger MinWindowWidth="740"/>
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <!-- MiddleRow (2) -->
@@ -44,7 +44,7 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <Grid Padding="32">
+        <Grid Padding="0,32">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="LeftGutter" Width="0"/>
                 <ColumnDefinition x:Name="LeftColumn" Width="0"/>
