@@ -5,47 +5,57 @@
     using System.Linq;
     using System.Text;
 
-    internal static class CharSets
+    internal static class Charsets
     {
+        // charset keys
         internal const string DIGITS = nameof(DIGITS);
         internal const string LOWERCASE = nameof(LOWERCASE);
         internal const string UPPERCASE = nameof(UPPERCASE);
         internal const string SYMBOLS = nameof(SYMBOLS);
-        internal const string ASCII = nameof(ASCII);
 
-        internal static readonly ReadOnlyDictionary<string, string> _fullCharSets;
-
-        static CharSets()
+        /// <summary>
+        /// ASCII charset without C0, SPACE and DEL characters.
+        /// </summary>
+        internal static readonly string _ascii;
+        internal static readonly ReadOnlyDictionary<string, string> _fullCharsets;
+        internal static readonly string[] _charsetKeys = new string[]
         {
-            string _ascii = BuildCharSet('!', '~');
-            string digits = BuildCharSet('0', '9');
-            string lowercase = BuildCharSet('a', 'z');
-            string uppercase = BuildCharSet('A', 'Z');
+            DIGITS,
+            LOWERCASE,
+            UPPERCASE,
+            SYMBOLS,
+        };
+
+        static Charsets()
+        {
+            _ascii = BuildCharset('!', '~');
+            string digits = BuildCharset('0', '9');
+            string lowercase = BuildCharset('a', 'z');
+            string uppercase = BuildCharset('A', 'Z');
 
             IEnumerable<char> symbols = _ascii
                 .Except(digits)
                 .Except(lowercase)
                 .Except(uppercase);
 
-            _fullCharSets = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
+            _fullCharsets = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
             {
                 { DIGITS, digits},
                 { LOWERCASE, lowercase},
                 { UPPERCASE, uppercase},
-                { SYMBOLS, string.Join(null, symbols) },
-                { ASCII, _ascii },
+                { SYMBOLS, string.Join(null, symbols) }
             });
         }
 
         /// <summary>
         /// Build a character set from the first and last members of a contiguous character sequence.
         /// </summary>
-        private static string BuildCharSet(char first, char last)
+        private static string BuildCharset(char first, char last)
         {
-            var charSet = new StringBuilder(last - first + 1);
+            var charset = new StringBuilder(last - first + 1);
             while (first <= last)
-                charSet.Append(first++);
-            return charSet.ToString();
+                charset.Append(first++);
+            return charset.ToString();
         }
     }
 }
