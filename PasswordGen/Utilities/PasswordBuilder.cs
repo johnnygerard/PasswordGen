@@ -3,7 +3,10 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    using static Charsets;
     using static CryptoRNG;
+    using static PasswordGen.Pages.SettingsPage;
+
 
     internal static class PasswordBuilder
     {
@@ -21,9 +24,13 @@
                 IEnumerable<char> charset = passwordDataEntry.Charset;
                 int charsetCount = charset.Count();
 
-                for (int i = 0; i < passwordDataEntry.Length; i++)
-                    password[passwordIndex++] = charset.ElementAt(GetRandomInt(charsetCount));
+                if (charsetCount > 0)
+                    for (int i = 0; i < passwordDataEntry.Length; i++)
+                        password[passwordIndex++] = charset.ElementAt(GetRandomInt(charsetCount));
             }
+
+            if (passwordIndex == 0)
+                return "CHARACTER SET EMPTY";
 
             Shuffle(password);
             return new string(password);
@@ -47,6 +54,19 @@
                 password[i] = password[randomIndex];
                 password[randomIndex] = temp;
             }
+        }
+
+        /// <summary>
+        /// Produce initial password data using the default settings.
+        /// </summary>
+        internal static Dictionary<string, PasswordDataEntry> BuildPasswordData()
+        {
+            var passwordData = new Dictionary<string, PasswordDataEntry>();
+            
+            foreach (string charsetKey in _charsetKeys)
+                passwordData.Add(charsetKey, new PasswordDataEntry(_fullCharsets[charsetKey], INIT_CHARSET_MIN));
+            passwordData.Add(MAIN_CHARSET, new PasswordDataEntry(new HashSet<char>(_ascii), INIT_LENGTH - (INIT_CHARSET_MIN * _charsetKeys.Length)));
+            return passwordData;
         }
     }
 }

@@ -13,19 +13,16 @@
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Controls.Primitives;
 
+    using static SettingsPage;
     using static Utilities.Charsets;
     using static Utilities.PasswordBuilder;
 
     public sealed partial class HomePage : Page
     {
-        private const string MAIN_CHARSET = nameof(MAIN_CHARSET);
-        private const int THROTTLE_DELAY = 4; // 4 ms to match a monitor refresh rate of 240 Hz
-        private const int CHARSET_MIN = 1;
-
-        private readonly Dictionary<string, PasswordDataEntry> _passwordData = new Dictionary<string, PasswordDataEntry>();
-        private readonly List<char> _mainCharset = new List<char>(_ascii.Length);
-        private readonly HashSet<ToggleSwitch> _toggleSwitchesOn = new HashSet<ToggleSwitch>();
+        private readonly HashSet<char> _mainCharset;
+        private readonly Dictionary<string, PasswordDataEntry> _passwordData;
         private readonly ReadOnlyCollection<ToggleSwitch> _toggleSwitches;
+        private readonly HashSet<ToggleSwitch> _toggleSwitchesOn;
 
         public HomePage()
         {
@@ -37,25 +34,10 @@
                 LowercaseSwitch,
                 UppercaseSwitch
             });
-        }
-
-        private void Page_Loaded(object sender, RoutedEventArgs e)
-        {
-            Loaded -= Page_Loaded; // Execute only at first page load.
-
-            // Initialize _passwordData
-            foreach (var toggleSwitch in _toggleSwitches)
-            {
-                var charsetKey = (string) toggleSwitch.Tag;
-                string charset = _fullCharsets[charsetKey];
-
-                Debug.Assert(toggleSwitch.IsOn);
-                _toggleSwitchesOn.Add(toggleSwitch);
-                _mainCharset.AddRange(charset);
-                _passwordData.Add(charsetKey, new PasswordDataEntry(charset, CHARSET_MIN));
-            }
-            int mainCharsetLength = (int) PasswordLengthSlider.Value - (_toggleSwitchesOn.Count * CHARSET_MIN);
-            _passwordData.Add(MAIN_CHARSET, new PasswordDataEntry(_mainCharset, mainCharsetLength));
+            _toggleSwitchesOn = new HashSet<ToggleSwitch>(_toggleSwitches);
+            Debug.Assert(_toggleSwitchesOn.Count == 4);
+            _passwordData = BuildPasswordData();
+            _mainCharset = (HashSet<char>) _passwordData[MAIN_CHARSET].Charset;
 
             // Attach event handlers
             foreach (var toggleSwitch in _toggleSwitches)
@@ -81,9 +63,9 @@
                 _toggleSwitchesOn.Add(toggleSwitch);
 
                 // Update _passwordData
-                _mainCharset.AddRange(charset);
-                _passwordData[MAIN_CHARSET].Length -= CHARSET_MIN;
-                _passwordData[charsetKey].Length = CHARSET_MIN;
+                _mainCharset.UnionWith(charset);
+                _passwordData[MAIN_CHARSET].Length -= INIT_CHARSET_MIN;
+                _passwordData[charsetKey].Length = INIT_CHARSET_MIN;
             }
             else
             {
@@ -97,8 +79,8 @@
                 }
 
                 // Update _passwordData
-                _mainCharset.RemoveRange(_mainCharset.IndexOf(charset[0]), charset.Length);
-                _passwordData[MAIN_CHARSET].Length += CHARSET_MIN;
+                _mainCharset.ExceptWith(charset);
+                _passwordData[MAIN_CHARSET].Length += INIT_CHARSET_MIN;
                 _passwordData[charsetKey].Length = 0;
             }
             RefreshPassword();
