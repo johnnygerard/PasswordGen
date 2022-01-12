@@ -1,31 +1,18 @@
-﻿// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
-
-namespace PasswordGen.Pages
+﻿namespace PasswordGen.Pages
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Runtime.InteropServices.WindowsRuntime;
-
-    using Windows.Foundation;
-    using Windows.Foundation.Collections;
-    using Windows.UI.Xaml;
     using Windows.UI.Xaml.Controls;
-    using Windows.UI.Xaml.Controls.Primitives;
-    using Windows.UI.Xaml.Data;
-    using Windows.UI.Xaml.Input;
-    using Windows.UI.Xaml.Media;
-    using Windows.UI.Xaml.Navigation;
 
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class SettingsPage : Page
     {
-        public SettingsPage()
-        {
-            this.InitializeComponent();
-        }
+        /// <summary>
+        /// Throttle delay of 4 ms to match a monitor refresh rate of 240 Hz.
+        /// </summary>
+        internal const int THROTTLE_DELAY = 4;
+
+        // Initial password settings
+        internal const int INIT_LENGTH = 16;
+        internal const int INIT_CHARSET_MIN = 1;
+
+        public SettingsPage() => InitializeComponent();
     }
 }

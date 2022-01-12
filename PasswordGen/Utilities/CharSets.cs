@@ -12,6 +12,7 @@
         internal const string LOWERCASE = nameof(LOWERCASE);
         internal const string UPPERCASE = nameof(UPPERCASE);
         internal const string SYMBOLS = nameof(SYMBOLS);
+        internal const string MAIN_CHARSET = nameof(MAIN_CHARSET);
 
         /// <summary>
         /// ASCII charset without C0, SPACE and DEL characters.
