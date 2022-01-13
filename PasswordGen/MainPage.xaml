@@ -30,20 +30,25 @@
             PaneDisplayMode="Top"
             Loaded="NavigationView_Loaded"
             SelectionChanged="NavigationView_SelectionChanged">
+            <muxc:NavigationView.Resources>
+                <Style TargetType="FontIcon">
+                    <Setter Property="FontFamily" Value="Segoe Fluent Icons,Segoe MDL2 Assets"/>
+                </Style>
+            </muxc:NavigationView.Resources>
             <muxc:NavigationView.MenuItems>
                 <muxc:NavigationViewItem Content="Home" x:Name="HomePage">
                     <muxc:NavigationViewItem.Icon>
-                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE80F;"/>
+                        <FontIcon Glyph="&#xE80F;"/>
                     </muxc:NavigationViewItem.Icon>
                 </muxc:NavigationViewItem>
                 <muxc:NavigationViewItem Content="Advanced" x:Name="AdvancedPage">
                     <muxc:NavigationViewItem.Icon>
-                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE9F5;"/>
+                        <FontIcon Glyph="&#xE9F5;"/>
                     </muxc:NavigationViewItem.Icon>
                 </muxc:NavigationViewItem>
                 <muxc:NavigationViewItem Content="About" x:Name="AboutPage">
                     <muxc:NavigationViewItem.Icon>
-                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE946;"/>
+                        <FontIcon Glyph="&#xE946;"/>
                     </muxc:NavigationViewItem.Icon>
                 </muxc:NavigationViewItem>
             </muxc:NavigationView.MenuItems>
