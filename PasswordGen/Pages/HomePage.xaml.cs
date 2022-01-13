@@ -36,7 +36,7 @@
             });
             _toggleSwitchesOn = new HashSet<ToggleSwitch>(_toggleSwitches);
             Debug.Assert(_toggleSwitchesOn.Count == 4);
-            _passwordData = BuildPasswordData();
+            _passwordData = GetInitialPasswordData();
             _mainCharset = (HashSet<char>) _passwordData[MAIN_CHARSET].Charset;
 
             // Attach event handlers

@@ -59,7 +59,7 @@
         /// <summary>
         /// Produce initial password data using the default settings.
         /// </summary>
-        internal static Dictionary<string, PasswordDataEntry> BuildPasswordData()
+        internal static Dictionary<string, PasswordDataEntry> GetInitialPasswordData()
         {
             var passwordData = new Dictionary<string, PasswordDataEntry>();
             
