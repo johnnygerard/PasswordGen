@@ -19,10 +19,10 @@
 
     public sealed partial class HomePage : Page
     {
-        private readonly HashSet<char> _mainCharset;
-        private readonly Dictionary<string, PasswordDataEntry> _passwordData;
         private readonly ReadOnlyCollection<ToggleSwitch> _toggleSwitches;
         private readonly HashSet<ToggleSwitch> _toggleSwitchesOn;
+        private readonly Dictionary<string, PasswordDataEntry> _passwordData;
+        private readonly HashSet<char> _mainCharset;
 
         public HomePage()
         {
@@ -35,9 +35,7 @@
                 UppercaseSwitch
             });
             _toggleSwitchesOn = new HashSet<ToggleSwitch>(_toggleSwitches);
-            Debug.Assert(_toggleSwitchesOn.Count == 4);
-            _passwordData = GetInitialPasswordData();
-            _mainCharset = (HashSet<char>) _passwordData[MAIN_CHARSET].Charset;
+            _passwordData = GetInitialPasswordData(out _mainCharset);
 
             // Attach event handlers
             foreach (var toggleSwitch in _toggleSwitches)
@@ -64,8 +62,8 @@
 
                 // Update _passwordData
                 _mainCharset.UnionWith(charset);
-                _passwordData[MAIN_CHARSET].Length -= INIT_CHARSET_MIN;
-                _passwordData[charsetKey].Length = INIT_CHARSET_MIN;
+                _passwordData[MAIN_CHARSET].Length--;
+                _passwordData[charsetKey].Charset = charset;
             }
             else
             {
@@ -80,8 +78,8 @@
 
                 // Update _passwordData
                 _mainCharset.ExceptWith(charset);
-                _passwordData[MAIN_CHARSET].Length += INIT_CHARSET_MIN;
-                _passwordData[charsetKey].Length = 0;
+                _passwordData[MAIN_CHARSET].Length++;
+                _passwordData[charsetKey].Charset = string.Empty;
             }
             RefreshPassword();
         }
@@ -98,24 +96,35 @@
                 _open = false;
                 await Task.Delay(THROTTLE_DELAY);
                 PasswordTextBlock.Text = BuildPassword(_passwordData.Values, (int) PasswordLengthSlider.Value);
-                #region Test password
-#if DEBUG
-                string password = PasswordTextBlock.Text;
-
-                // validate length
-                Debug.Assert(password.Length == (int) PasswordLengthSlider.Value);
-
-                // validate charsets
-                foreach (var toggleSwitch in _toggleSwitches)
-                {
-                    string charsetKey = (string) toggleSwitch.Tag;
-                    string charset = _fullCharsets[charsetKey];
-
-                    Debug.Assert(password.Intersect(charset).Any() == toggleSwitch.IsOn);
-                }
-#endif 
-                #endregion
+                TestProgram();
                 _open = true;
+            }
+        }
+
+        [Conditional("DEBUG")]
+        private void TestProgram()
+        {
+            int toggleSwitchesOnCount = _toggleSwitches.Where(toggleSwitch => toggleSwitch.IsOn).Count();
+
+            // Test empty charset validation
+            Debug.Assert(toggleSwitchesOnCount > 0 && toggleSwitchesOnCount <= _toggleSwitches.Count);
+            if (toggleSwitchesOnCount == 1)
+                foreach (var toggleSwitch in _toggleSwitches)
+                    Debug.Assert(toggleSwitch.IsOn == !toggleSwitch.IsEnabled);
+            else
+                foreach (var toggleSwitch in _toggleSwitches)
+                    Debug.Assert(toggleSwitch.IsEnabled);
+
+            // Test length
+            Debug.Assert(PasswordTextBlock.Text.Length == (int) PasswordLengthSlider.Value);
+
+            // Test length per charset (at least one when on, zero when off)
+            foreach (var toggleSwitch in _toggleSwitches)
+            {
+                string charsetKey = (string) toggleSwitch.Tag;
+                string charset = _fullCharsets[charsetKey];
+
+                Debug.Assert(PasswordTextBlock.Text.Intersect(charset).Any() == toggleSwitch.IsOn);
             }
         }
 
