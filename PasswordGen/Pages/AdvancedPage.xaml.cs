@@ -23,6 +23,9 @@
 
     public sealed partial class AdvancedPage : Page
     {
+        // Throttle delay of 4 ms to match a monitor refresh rate of 240 Hz.
+        private const int THROTTLE_DELAY = 4;
+        private const string DEBUG = nameof(DEBUG);
         private const char ZWSP = '\u200B'; // ZERO WIDTH SPACE
         private const string CHARSET_EMPTY_MESSAGE = "CHARACTER SET EMPTY";
 
@@ -59,7 +62,10 @@
             };
             foreach (NumberBox charsetMin in _charsetMins.Values)
                 charsetMin.NumberFormatter = numberFormatter;
+        }
 
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
             // Attach event handlers
             foreach (var toggleButton in _toggleButtons)
             {
@@ -73,6 +79,9 @@
             PasswordLengthSlider.ValueChanged += PasswordLengthSlider_ValueChanged;
 
             RefreshPassword();
+
+            // Page_Loaded removes itself to execute on first load only.
+            ((Page) Frame.Content).Loaded -= Page_Loaded;
         }
 
         private void ToggleButton_Checked(object sender, RoutedEventArgs e)
@@ -237,7 +246,7 @@
             }
         }
 
-        [Conditional("DEBUG")]
+        [Conditional(DEBUG)]
         private void TestProgram()
         {
             string includedCharset = IncludeTextBox.Text;

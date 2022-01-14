@@ -13,12 +13,15 @@
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Controls.Primitives;
 
-    using static SettingsPage;
     using static Utilities.Charsets;
     using static Utilities.PasswordBuilder;
 
     public sealed partial class HomePage : Page
     {
+        // Throttle delay of 4 ms to match a monitor refresh rate of 240 Hz.
+        private const int THROTTLE_DELAY = 4;
+        private const string DEBUG = nameof(DEBUG);
+
         private readonly ReadOnlyCollection<ToggleSwitch> _toggleSwitches;
         private readonly HashSet<ToggleSwitch> _toggleSwitchesOn;
         private readonly Dictionary<string, PasswordDataEntry> _passwordData;
@@ -36,13 +39,19 @@
             });
             _toggleSwitchesOn = new HashSet<ToggleSwitch>(_toggleSwitches);
             _passwordData = GetInitialPasswordData(out _mainCharset);
+        }
 
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
             // Attach event handlers
             foreach (var toggleSwitch in _toggleSwitches)
                 toggleSwitch.Toggled += ToggleSwitch_Toggled;
             PasswordLengthSlider.ValueChanged += PasswordLengthSlider_ValueChanged;
 
             RefreshPassword();
+
+            // Page_Loaded removes itself to execute on first load only.
+            ((Page) Frame.Content).Loaded -= Page_Loaded;
         }
 
         private ToggleSwitch _disabledToggleSwitch;
@@ -101,7 +110,7 @@
             }
         }
 
-        [Conditional("DEBUG")]
+        [Conditional(DEBUG)]
         private void TestProgram()
         {
             int toggleSwitchesOnCount = _toggleSwitches.Where(toggleSwitch => toggleSwitch.IsOn).Count();
