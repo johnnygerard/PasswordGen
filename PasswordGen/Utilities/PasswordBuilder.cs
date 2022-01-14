@@ -29,9 +29,6 @@
                         password[passwordIndex++] = charset.ElementAt(GetRandomInt(charsetCount));
             }
 
-            if (passwordIndex == 0)
-                return "CHARACTER SET EMPTY";
-
             Shuffle(password);
             return new string(password);
         }

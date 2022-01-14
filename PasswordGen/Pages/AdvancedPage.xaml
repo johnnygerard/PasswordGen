@@ -8,14 +8,13 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    NavigationCacheMode="Required"
-    Loaded="Page_Loaded">
+    NavigationCacheMode="Required">
     <ScrollViewer>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState>
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="720"/>
+                        <AdaptiveTrigger MinWindowWidth="800"/>
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <!-- MiddleRow (2) -->
@@ -45,7 +44,7 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <Grid Padding="32">
+        <Grid Padding="0,32">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="LeftGutter" Width="0"/>
                 <ColumnDefinition x:Name="LeftColumn" Width="0"/>
@@ -60,18 +59,22 @@
                 <RowDefinition x:Name="BottomRow" Height="Auto"/>
                 <RowDefinition x:Name="BottomGutter"/>
             </Grid.RowDefinitions>
-            <StackPanel x:Name="PasswordPanel" Grid.Column="2" Grid.Row="1"
+            <StackPanel
+                x:Name="PasswordPanel"
+                Width="300"
+                Grid.Column="2" Grid.Row="1"
                 HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock
                     x:Name="PasswordTextBlock"
                     Text="pI9wftYnd7,r751a"
-                    HorizontalAlignment="Center"
+                    TextWrapping="Wrap"
+                    HorizontalTextAlignment="Center"
                     FontFamily="Consolas"
                     FontSize="{x:Bind CopyButton.FontSize}"/>
                 <StackPanel Orientation="Horizontal" Margin="0,32,0,40" HorizontalAlignment="Center">
                     <Button Click="CopyButton_Click" CornerRadius="4,0,0,4" x:Name="CopyButton">Copy</Button>
                     <Button Click="RefreshButton_Click" CornerRadius="0,4,4,0" Height="32" ToolTipService.ToolTip="Refresh password">
-                        <FontIcon FontFamily="Segoe Fluent Icons" FontSize="{x:Bind CopyButton.FontSize}" Glyph="&#xE72C;"/>
+                        <FontIcon FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" FontSize="{x:Bind CopyButton.FontSize}" Glyph="&#xE72C;"/>
                     </Button>
                 </StackPanel>
                 <Slider
@@ -79,9 +82,9 @@
                     Maximum="256"
                     Value="16"
                     Minimum="4"
-                    Header="Length"
-                    Width="300"/>
-                <TextBox x:Name="ExcludeTextBox" Header="Exclude" Margin="0,24,0,0"/>
+                    Header="Length"/>
+                <TextBox x:Name="IncludeTextBox" Header="Include" Margin="0,24"/>
+                <TextBox x:Name="ExcludeTextBox" Header="Exclude"/>
             </StackPanel>
             <Grid x:Name="SwitchContainer" Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center">
                 <Grid.Resources>
@@ -92,10 +95,12 @@
                         <Setter Property="VerticalAlignment" Value="Top"/>
                     </Style>
                     <Style TargetType="muxc:NumberBox">
-                        <Setter Property="SpinButtonPlacementMode" Value="Compact"/>
+                        <Setter Property="Maximum" Value="13"/>
                         <Setter Property="Value" Value="1"/>
+                        <Setter Property="Minimum" Value="0"/>
                         <Setter Property="Grid.Column" Value="2"/>
                         <Setter Property="VerticalAlignment" Value="Top"/>
+                        <Setter Property="SpinButtonPlacementMode" Value="Compact"/>
                     </Style>
                 </Grid.Resources>
                 <Grid.ColumnDefinitions>
@@ -120,19 +125,19 @@
                     BorderBrush="{ThemeResource ButtonBorderThemeBrush}">
                     <TextBlock Text="Min" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
-                <ToggleButton Grid.Row="1" Content="{StaticResource DIGITS_NAME}"/>
-                <ToggleButton Grid.Row="2" Content="{StaticResource SYMBOLS_NAME}"/>
-                <ToggleButton Grid.Row="3" Content="{StaticResource LOWERCASE_NAME}"/>
-                <ToggleButton Grid.Row="4" Content="{StaticResource UPPERCASE_NAME}"/>
-                <muxc:NumberBox Grid.Row="1"/>
-                <muxc:NumberBox Grid.Row="2"/>
-                <muxc:NumberBox Grid.Row="3"/>
-                <muxc:NumberBox Grid.Row="4"/>
+                <ToggleButton Grid.Row="1" Tag="{x:Bind util:Charsets.DIGITS}" x:Name="DigitSwitch" Content="{StaticResource DIGITS_NAME}"/>
+                <ToggleButton Grid.Row="2" Tag="{x:Bind util:Charsets.SYMBOLS}" x:Name="SymbolSwitch" Content="{StaticResource SYMBOLS_NAME}"/>
+                <ToggleButton Grid.Row="3" Tag="{x:Bind util:Charsets.LOWERCASE}" x:Name="LowercaseSwitch" Content="{StaticResource LOWERCASE_NAME}"/>
+                <ToggleButton Grid.Row="4" Tag="{x:Bind util:Charsets.UPPERCASE}" x:Name="UppercaseSwitch" Content="{StaticResource UPPERCASE_NAME}"/>
+                <muxc:NumberBox Grid.Row="1" Tag="{x:Bind util:Charsets.DIGITS}" x:Name="DigitMin"/>
+                <muxc:NumberBox Grid.Row="2" Tag="{x:Bind util:Charsets.SYMBOLS}" x:Name="SymbolMin"/>
+                <muxc:NumberBox Grid.Row="3" Tag="{x:Bind util:Charsets.LOWERCASE}" x:Name="LowercaseMin"/>
+                <muxc:NumberBox Grid.Row="4" Tag="{x:Bind util:Charsets.UPPERCASE}" x:Name="UppercaseMin"/>
                 <StackPanel Grid.Row="5" Grid.ColumnSpan="3"
                     Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
                     <Button Click="ResetButton_Click" CornerRadius="4,0,0,4">Reset</Button>
                     <Button Click="SaveSettings_Click" CornerRadius="0,4,4,0"  Height="32" ToolTipService.ToolTip="Set current settings as default">
-                        <FontIcon FontFamily="Segoe Fluent Icons" FontSize="{x:Bind CopyButton.FontSize}" Glyph="&#xE105;"/>
+                        <FontIcon FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" FontSize="{x:Bind CopyButton.FontSize}" Glyph="&#xE105;"/>
                     </Button>
                 </StackPanel>
             </Grid>
