@@ -7,12 +7,16 @@
 
     internal static class Charsets
     {
+        /// <summary>
+        /// Main charset key
+        /// </summary>
+        internal const string MAIN_CHARSET = nameof(MAIN_CHARSET);
+
         // charset keys
         internal const string DIGITS = nameof(DIGITS);
         internal const string LOWERCASE = nameof(LOWERCASE);
         internal const string UPPERCASE = nameof(UPPERCASE);
         internal const string SYMBOLS = nameof(SYMBOLS);
-        internal const string MAIN_CHARSET = nameof(MAIN_CHARSET);
 
         /// <summary>
         /// ASCII charset without C0, SPACE and DEL characters.

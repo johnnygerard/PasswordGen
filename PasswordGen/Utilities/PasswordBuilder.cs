@@ -5,11 +5,12 @@
 
     using static Charsets;
     using static CryptoRNG;
-    using static PasswordGen.Pages.SettingsPage;
 
 
     internal static class PasswordBuilder
     {
+        private const int INITIAL_CHARSET_MINIMUM = 1;
+        private const int INITIAL_LENGTH = 16;
 
         /// <summary>
         /// Return a randomly generated password based on a list of charsets with associated length.
@@ -62,9 +63,9 @@
             mainCharset = new HashSet<char>(_ascii);
 
             foreach (string charsetKey in _charsetKeys)
-                passwordData.Add(charsetKey, new PasswordDataEntry(_fullCharsets[charsetKey], INIT_CHARSET_MIN));
+                passwordData.Add(charsetKey, new PasswordDataEntry(_fullCharsets[charsetKey], INITIAL_CHARSET_MINIMUM));
 
-            passwordData.Add(MAIN_CHARSET, new PasswordDataEntry(mainCharset, INIT_LENGTH - (INIT_CHARSET_MIN * _charsetKeys.Length)));
+            passwordData.Add(MAIN_CHARSET, new PasswordDataEntry(mainCharset, INITIAL_LENGTH - (INITIAL_CHARSET_MINIMUM * _charsetKeys.Length)));
             return passwordData;
         }
     }
