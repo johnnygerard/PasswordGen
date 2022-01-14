@@ -56,13 +56,15 @@
         /// <summary>
         /// Produce initial password data using the default settings.
         /// </summary>
-        internal static Dictionary<string, PasswordDataEntry> GetInitialPasswordData()
+        internal static Dictionary<string, PasswordDataEntry> GetInitialPasswordData(out HashSet<char> mainCharset)
         {
             var passwordData = new Dictionary<string, PasswordDataEntry>();
-            
+            mainCharset = new HashSet<char>(_ascii);
+
             foreach (string charsetKey in _charsetKeys)
                 passwordData.Add(charsetKey, new PasswordDataEntry(_fullCharsets[charsetKey], INIT_CHARSET_MIN));
-            passwordData.Add(MAIN_CHARSET, new PasswordDataEntry(new HashSet<char>(_ascii), INIT_LENGTH - (INIT_CHARSET_MIN * _charsetKeys.Length)));
+
+            passwordData.Add(MAIN_CHARSET, new PasswordDataEntry(mainCharset, INIT_LENGTH - (INIT_CHARSET_MIN * _charsetKeys.Length)));
             return passwordData;
         }
     }

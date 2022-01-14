@@ -49,8 +49,7 @@
                 { LOWERCASE, LowercaseMin },
                 { UPPERCASE, UppercaseMin },
             });
-            _passwordData = GetInitialPasswordData();
-            _mainCharset = (HashSet<char>) _passwordData[MAIN_CHARSET].Charset;
+            _passwordData = GetInitialPasswordData(out _mainCharset);
 
             // Set NumberBox integer format.
             var numberFormatter = new DecimalFormatter
