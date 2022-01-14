@@ -8,8 +8,13 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    NavigationCacheMode="Required">
+    NavigationCacheMode="Required"
+    Loaded="Page_Loaded">
     <ScrollViewer>
+        <!--This layout uses a 5x5 matrix to switch between vertical and horizontal
+                while allowing for a responsive design.
+            There could be a simpler design that I'm unaware of.
+        -->
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState>

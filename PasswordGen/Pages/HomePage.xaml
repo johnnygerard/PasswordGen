@@ -7,8 +7,13 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    NavigationCacheMode="Required">
+    NavigationCacheMode="Required"
+    Loaded="Page_Loaded">
     <ScrollViewer>
+        <!--This layout uses a 5x5 matrix to switch between vertical and horizontal
+                while allowing for a responsive design.
+            There could be a simpler design that I'm unaware of.
+        -->
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState>
@@ -90,10 +95,15 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <ToggleSwitch Grid.Row="0" Grid.Column="0" IsOn="True" Tag="{x:Bind util:Charsets.DIGITS}" x:Name="DigitSwitch" Header="{StaticResource DIGITS_NAME}"/>
-                <ToggleSwitch Grid.Row="1" Grid.Column="0" IsOn="True" Tag="{x:Bind util:Charsets.SYMBOLS}" x:Name="SymbolSwitch" Header="{StaticResource SYMBOLS_NAME}"/>
-                <ToggleSwitch Grid.Row="0" Grid.Column="1" IsOn="True" Tag="{x:Bind util:Charsets.LOWERCASE}" x:Name="LowercaseSwitch" Header="{StaticResource LOWERCASE_NAME}" MinWidth="0"/>
-                <ToggleSwitch Grid.Row="1" Grid.Column="1" IsOn="True" Tag="{x:Bind util:Charsets.UPPERCASE}" x:Name="UppercaseSwitch" Header="{StaticResource UPPERCASE_NAME}" MinWidth="0"/>
+                <Grid.Resources>
+                    <Style TargetType="ToggleSwitch">
+                        <Setter Property="IsOn" Value="True"/>
+                    </Style>
+                </Grid.Resources>
+                <ToggleSwitch Grid.Row="0" Grid.Column="0" Tag="{x:Bind util:Charsets.DIGITS}" x:Name="DigitSwitch" Header="{StaticResource DIGITS_NAME}"/>
+                <ToggleSwitch Grid.Row="1" Grid.Column="0" Tag="{x:Bind util:Charsets.SYMBOLS}" x:Name="SymbolSwitch" Header="{StaticResource SYMBOLS_NAME}"/>
+                <ToggleSwitch Grid.Row="0" Grid.Column="1" Tag="{x:Bind util:Charsets.LOWERCASE}" x:Name="LowercaseSwitch" Header="{StaticResource LOWERCASE_NAME}" MinWidth="0"/>
+                <ToggleSwitch Grid.Row="1" Grid.Column="1" Tag="{x:Bind util:Charsets.UPPERCASE}" x:Name="UppercaseSwitch" Header="{StaticResource UPPERCASE_NAME}" MinWidth="0"/>
                 <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,32,0,0">
                     <Button Click="ResetButton_Click" CornerRadius="4,0,0,4">Reset</Button>
                     <Button Click="SaveSettings_Click" CornerRadius="0,4,4,0"  Height="32" ToolTipService.ToolTip="Set current settings as default">
