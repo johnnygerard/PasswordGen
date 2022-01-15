@@ -9,6 +9,7 @@
     using Utilities;
 
     using Windows.ApplicationModel.DataTransfer;
+    using Windows.Storage;
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Controls.Primitives;
@@ -21,7 +22,10 @@
         // Throttle delay of 4 ms to match a monitor refresh rate of 240 Hz.
         private const int THROTTLE_DELAY = 4;
         private const string DEBUG = nameof(DEBUG);
+        private const string HOME_PAGE_SETTINGS = nameof(HOME_PAGE_SETTINGS);
+        private const string LENGTH = nameof(LENGTH);
 
+        private readonly IDictionary<string, object> _homeSettings;
         private readonly ReadOnlyCollection<ToggleSwitch> _toggleSwitches;
         private readonly HashSet<ToggleSwitch> _toggleSwitchesOn;
         private readonly Dictionary<string, PasswordDataEntry> _passwordData;
@@ -30,6 +34,7 @@
         public HomePage()
         {
             InitializeComponent();
+            _homeSettings = ApplicationData.Current.LocalSettings.CreateContainer(HOME_PAGE_SETTINGS, ApplicationDataCreateDisposition.Always).Values;
             _toggleSwitches = new ReadOnlyCollection<ToggleSwitch>(new ToggleSwitch[]
             {
                 DigitSwitch,
@@ -43,15 +48,18 @@
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            // Page_Loaded removes itself to execute on first load only.
+            ((Page) Frame.Content).Loaded -= Page_Loaded;
+
             // Attach event handlers
             foreach (var toggleSwitch in _toggleSwitches)
                 toggleSwitch.Toggled += ToggleSwitch_Toggled;
             PasswordLengthSlider.ValueChanged += PasswordLengthSlider_ValueChanged;
 
-            RefreshPassword();
-
-            // Page_Loaded removes itself to execute on first load only.
-            ((Page) Frame.Content).Loaded -= Page_Loaded;
+            if (_homeSettings.Any())
+                ApplyUserSettings();
+            else
+                RefreshPassword();
         }
 
         private ToggleSwitch _disabledToggleSwitch;
@@ -153,13 +161,40 @@
             _dataPackage.SetText(PasswordTextBlock.Text);
             Clipboard.SetContent(_dataPackage);
         }
+
         private void SaveSettings_Click(object sender, RoutedEventArgs e)
         {
-
+            foreach (var toggleSwitch in _toggleSwitches)
+                _homeSettings[(string) toggleSwitch.Tag] = toggleSwitch.IsOn;
+            _homeSettings[LENGTH] = (int) PasswordLengthSlider.Value;
         }
+
         private void ResetButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_homeSettings.Any())
+                ApplyUserSettings();
+            else
+            {
+                foreach (var toggleSwitch in _toggleSwitches)
+                    toggleSwitch.IsOn = true;
+                PasswordLengthSlider.Value = SettingsPage.DEFAULT_LENGTH;
+            }
+        }
 
+        private void ApplyUserSettings()
+        {
+            // Turn a ToggleSwitch on first to avoid all ToggleSwitches being turned off
+            foreach (var toggleSwitch in _toggleSwitches)
+                if ((bool) _homeSettings[(string) toggleSwitch.Tag])
+                {
+                    toggleSwitch.IsOn = true;
+                    break;
+                }
+
+            foreach (var toggleSwitch in _toggleSwitches)
+                toggleSwitch.IsOn = (bool) _homeSettings[(string) toggleSwitch.Tag];
+
+            PasswordLengthSlider.Value = (int) _homeSettings[LENGTH];
         }
     }
 }
