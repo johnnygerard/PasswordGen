@@ -1,10 +1,10 @@
 ﻿namespace PasswordGen.Pages
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
+    using System.Text;
     using System.Threading.Tasks;
 
     using Microsoft.UI.Xaml.Controls;
@@ -17,7 +17,6 @@
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Controls.Primitives;
 
-    using static SettingsPage;
     using static Utilities.Charsets;
     using static Utilities.PasswordBuilder;
 
@@ -37,6 +36,12 @@
 
         public AdvancedPage()
         {
+            var numberFormatter = new DecimalFormatter
+            {
+                NumberRounder = new IncrementNumberRounder { RoundingAlgorithm = RoundingAlgorithm.RoundTowardsZero },
+                FractionDigits = 0,
+            };
+
             InitializeComponent();
             _toggleButtons = new ReadOnlyCollection<ToggleButton>(new ToggleButton[]
             {
@@ -55,11 +60,6 @@
             _passwordData = GetInitialPasswordData(out _mainCharset);
 
             // Set NumberBox integer format.
-            var numberFormatter = new DecimalFormatter
-            {
-                NumberRounder = new IncrementNumberRounder { RoundingAlgorithm = RoundingAlgorithm.RoundTowardsZero },
-                FractionDigits = 0,
-            };
             foreach (NumberBox charsetMin in _charsetMins.Values)
                 charsetMin.NumberFormatter = numberFormatter;
         }
@@ -84,27 +84,27 @@
             ((Page) Frame.Content).Loaded -= Page_Loaded;
         }
 
-        private void ToggleButton_Checked(object sender, RoutedEventArgs e)
+        private void ToggleButton_Checked(object sender, RoutedEventArgs e) => ToggleButton_Toggled(sender, true);
+        private void ToggleButton_Unchecked(object sender, RoutedEventArgs e) => ToggleButton_Toggled(sender, false);
+
+        private void ToggleButton_Toggled(object sender, bool isChecked)
         {
             var toggleButton = (ToggleButton) sender;
             var charsetKey = (string) toggleButton.Tag;
             NumberBox charsetMin = _charsetMins[charsetKey];
 
-            UpdatePasswordData(ExcludeTextBox.Text, charsetKey, false);
-            if (!charsetMin.IsEnabled)
-                TurnOn(charsetMin);
-            RefreshPassword();
-        }
-
-        private void ToggleButton_Unchecked(object sender, RoutedEventArgs e)
-        {
-            var toggleButton = (ToggleButton) sender;
-            var charsetKey = (string) toggleButton.Tag;
-            NumberBox charsetMin = _charsetMins[charsetKey];
-
-            UpdatePasswordData(IncludeTextBox.Text, charsetKey, true);
-            if (!_passwordData[charsetKey].Charset.Any())
-                TurnOff(charsetMin);
+            if (isChecked)
+            {
+                UpdatePasswordDataCharset(ExcludeTextBox.Text, charsetKey, false);
+                if (!charsetMin.IsEnabled)
+                    TurnOn(charsetMin);
+            }
+            else
+            {
+                UpdatePasswordDataCharset(IncludeTextBox.Text, charsetKey, true);
+                if (!_passwordData[charsetKey].Charset.Any())
+                    TurnOff(charsetMin);
+            }
             RefreshPassword();
         }
 
@@ -153,25 +153,35 @@
             PasswordLengthSlider.Minimum += delta;
 
             // invariant #2
-            foreach (NumberBox charsetMin in _charsetMins.Values.Where(charsetMin => charsetMin.IsEnabled))
-                if (charsetMin != sender) charsetMin.Maximum -= delta;
+            foreach (NumberBox charsetMin in _charsetMins.Values.Where(charsetMin => charsetMin.IsEnabled && charsetMin != sender))
+                charsetMin.Maximum -= delta;
 
             // Update _passwordData
             _passwordData[(string) sender.Tag].Length += delta;
             _passwordData[MAIN_CHARSET].Length -= delta;
         }
 
+        private void UpdatePasswordDataCharset(IEnumerable<char> charset, string charsetKey, bool included)
+        {
+            var passwordDataEntry = _passwordData[charsetKey];
+            string fullCharset = _fullCharsets[charsetKey];
+
+            passwordDataEntry.Charset = included ? fullCharset.Intersect(charset) : fullCharset.Except(charset);
+            _mainCharset.ExceptWith(fullCharset);
+            _mainCharset.UnionWith(passwordDataEntry.Charset);
+        }
+
         private void IncludeTextBox_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
         {
-            IEnumerable<char> sanitizedText = sender.Text.Intersect(_ascii).Except(ExcludeTextBox.Text);
+            IEnumerable<char> includedCharset = sender.Text.Intersect(_ascii).Except(ExcludeTextBox.Text);
 
-            sender.Text = string.Join(null, sanitizedText);
+            sender.Text = string.Join(null, includedCharset);
             foreach (var toggleButton in _toggleButtons.Where(toggleButton => !(bool) toggleButton.IsChecked))
             {
                 string charsetKey = (string) toggleButton.Tag;
                 NumberBox charsetMin = _charsetMins[charsetKey];
 
-                UpdatePasswordData(sender.Text, charsetKey, true);
+                UpdatePasswordDataCharset(sender.Text, charsetKey, true);
                 if (_passwordData[charsetKey].Charset.Any())
                 {
                     if (!charsetMin.IsEnabled)
@@ -186,33 +196,23 @@
         private string _oldExcludedCharset = string.Empty;
         private void ExcludeTextBox_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
         {
-            IEnumerable<char> sanitizedText = sender.Text.Intersect(_ascii).Except(IncludeTextBox.Text);
+            IEnumerable<char> excludedCharset = sender.Text.Intersect(_ascii).Except(IncludeTextBox.Text);
 
-            // Suppressed charset validation
+            // Avoid excluding entire charsets.
             foreach (string charsetKey in _charsetKeys)
             {
-                if (_fullCharsets[charsetKey].All(character => sanitizedText.Contains(character)))
+                if (_fullCharsets[charsetKey].All(character => excludedCharset.Contains(character)))
                 {
                     sender.Text = _oldExcludedCharset;
                     return;
                 }
             }
 
-            sender.Text = string.Join(null, sanitizedText);
+            sender.Text = string.Join(null, excludedCharset);
             _oldExcludedCharset = sender.Text;
             foreach (var toggleButton in _toggleButtons.Where(toggleButton => (bool) toggleButton.IsChecked))
-                UpdatePasswordData(sender.Text, (string) toggleButton.Tag, false);
+                UpdatePasswordDataCharset(sender.Text, (string) toggleButton.Tag, false);
             RefreshPassword();
-        }
-
-        private void UpdatePasswordData(IEnumerable<char> charset, string charsetKey, bool included)
-        {
-            var passwordDataEntry = _passwordData[charsetKey];
-            string fullCharset = _fullCharsets[charsetKey];
-
-            passwordDataEntry.Charset = included ? fullCharset.Intersect(charset) : fullCharset.Except(charset);
-            _mainCharset.ExceptWith(fullCharset);
-            _mainCharset.UnionWith(passwordDataEntry.Charset);
         }
 
         private bool _open = true;
@@ -232,79 +232,25 @@
                 _open = true;
             }
 
-            // Insert ZERO WIDTH SPACE (U+200B) characters to wrap the password at any character position.
+            // Insert ZERO WIDTH SPACE (U+200B) characters to enable character wrapping.
             string InsertZWSP(string password)
             {
-                var newPassword = new char[password.Length * 2];
+                var wrappedPassword = new StringBuilder(password.Length * 2);
 
-                for (int i = 0, j = 0; i < password.Length; i++, j += 2)
-                {
-                    newPassword[j] = password[i];
-                    newPassword[j + 1] = ZWSP;
-                }
-                return string.Join(null, newPassword);
+                foreach (var character in password)
+                    wrappedPassword.Append($"{character}{ZWSP}");
+                return wrappedPassword.ToString();
             }
         }
 
         [Conditional(DEBUG)]
         private void TestProgram()
         {
+            var mainCharset = new HashSet<char>(_ascii.Length);
             string includedCharset = IncludeTextBox.Text;
             string excludedCharset = ExcludeTextBox.Text;
             const int BYTE_RANGE = 256;
-
-            if (PasswordTextBlock.Text == CHARSET_EMPTY_MESSAGE)
-            {
-                foreach (var toggleButton in _toggleButtons)
-                    Debug.Assert(!(bool) toggleButton.IsChecked);
-                Debug.Assert(IncludeTextBox.Text == string.Empty);
-                return;
-            }
-
-            foreach (var toggleButton in _toggleButtons)
-            {
-                var charsetKey = (string) toggleButton.Tag;
-                NumberBox charsetMin = _charsetMins[charsetKey];
-                var min = (int) charsetMin.Value;
-                IEnumerable<char> charset = (bool) toggleButton.IsChecked
-                    ? _fullCharsets[charsetKey].Except(ExcludeTextBox.Text)
-                    : _fullCharsets[charsetKey].Intersect(includedCharset);
-
-                // Test charsetMin minimum
-                Debug.Assert(charsetMin.Minimum == 0);
-
-                if (charsetMin.IsEnabled)
-                {
-                    // Test charsetMin value
-                    Debug.Assert(_password.Count(character => charset.Contains(character)) >= min);
-                    Debug.Assert(charsetMin.Value == min); // Fractional part must be zero
-                }
-                else
-                {
-                    // must be NaN
-                    Debug.Assert(double.IsNaN(charsetMin.Value));
-
-                    // charset must be empty
-                    Debug.Assert(!_password.Intersect(charset).Any());
-                }
-            }
-
-            // Test charsetMin maximum (invariant #2)
-            foreach (NumberBox charsetMin in _charsetMins.Values)
-                if (charsetMin.IsEnabled)
-                    Debug.Assert(charsetMin.Maximum - charsetMin.Value == PasswordLengthSlider.Value - PasswordLengthSlider.Minimum);
-
-            // Test password length minimum (invariant #1)
             double enabledCharsetMinSum = 0;
-            foreach (NumberBox charsetMin in _charsetMins.Values.Where(charsetMin => charsetMin.IsEnabled))
-                enabledCharsetMinSum += charsetMin.Value;
-            Debug.Assert(PasswordLengthSlider.Minimum == enabledCharsetMinSum);
-
-            // Test password length value
-            Debug.Assert(_password.Length == (int) PasswordLengthSlider.Value);
-
-            // Test password length maximum
-            Debug.Assert(PasswordLengthSlider.Maximum == BYTE_RANGE);
 
             #region TextBox input validation
             // No duplicate characters
@@ -322,6 +268,50 @@
             foreach (string charsetKey in _charsetKeys)
                 Debug.Assert(_fullCharsets[charsetKey].Except(excludedCharset).Any());
             #endregion
+
+            foreach (var toggleButton in _toggleButtons)
+            {
+                var charsetKey = (string) toggleButton.Tag;
+                NumberBox charsetMin = _charsetMins[charsetKey];
+                IEnumerable<char> charset = (bool) toggleButton.IsChecked
+                    ? _fullCharsets[charsetKey].Except(ExcludeTextBox.Text)
+                    : _fullCharsets[charsetKey].Intersect(includedCharset);
+
+                mainCharset.UnionWith(charset);
+
+                // Test charsetMin minimum
+                Debug.Assert(charsetMin.Minimum == 0);
+
+                // Charset not empty iff charset enabled
+                Debug.Assert(charset.Any() == charsetMin.IsEnabled);
+
+                if (charsetMin.IsEnabled)
+                {
+                    // Fractional part must be zero
+                    Debug.Assert(charsetMin.Value == (int) charsetMin.Value);
+
+                    // Test length per charset
+                    Debug.Assert(_password.Count(character => charset.Contains(character)) >= charsetMin.Value);
+
+                    // Test charsetMin maximum (invariant #2)
+                    Debug.Assert(charsetMin.Maximum - charsetMin.Value == PasswordLengthSlider.Value - PasswordLengthSlider.Minimum);
+                    
+                    enabledCharsetMinSum += charsetMin.Value;
+                }
+                else
+                    Debug.Assert(double.IsNaN(charsetMin.Value));
+            }
+
+            Debug.Assert(mainCharset.Any() == (PasswordTextBlock.Text != CHARSET_EMPTY_MESSAGE));
+
+            // Test minimum length (invariant #1)
+            Debug.Assert(PasswordLengthSlider.Minimum == enabledCharsetMinSum);
+
+            // Test length
+            Debug.Assert(_password.Length == (int) PasswordLengthSlider.Value);
+
+            // Test maximum length
+            Debug.Assert(PasswordLengthSlider.Maximum == BYTE_RANGE);
         }
 
 
@@ -343,8 +333,11 @@
         private readonly DataPackage _dataPackage = new DataPackage();
         private void CopyButton_Click(object sender, RoutedEventArgs e)
         {
-            _dataPackage.SetText(_password);
-            Clipboard.SetContent(_dataPackage);
+            if (_password != string.Empty)
+            {
+                _dataPackage.SetText(_password);
+                Clipboard.SetContent(_dataPackage);
+            }
         }
 
         private void SaveSettings_Click(object sender, RoutedEventArgs e)
