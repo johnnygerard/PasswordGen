@@ -115,8 +115,10 @@
         {
             int toggleSwitchesOnCount = _toggleSwitches.Where(toggleSwitch => toggleSwitch.IsOn).Count();
 
-            // Test empty charset validation
-            Debug.Assert(toggleSwitchesOnCount > 0 && toggleSwitchesOnCount <= _toggleSwitches.Count);
+            // At least one charset is on
+            Debug.Assert(toggleSwitchesOnCount > 0);
+
+            // Test ToggleSwitch.IsEnabled
             if (toggleSwitchesOnCount == 1)
                 foreach (var toggleSwitch in _toggleSwitches)
                     Debug.Assert(toggleSwitch.IsOn == !toggleSwitch.IsEnabled);

@@ -30,6 +30,8 @@
                         password[passwordIndex++] = charset.ElementAt(GetRandomInt(charsetCount));
             }
 
+            if (passwordIndex == 0)
+                return string.Empty;
             Shuffle(password);
             return new string(password);
         }

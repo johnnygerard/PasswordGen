@@ -227,6 +227,7 @@
                 _open = false;
                 await Task.Delay(THROTTLE_DELAY);
                 _password = BuildPassword(_passwordData.Values, (int) PasswordLengthSlider.Value);
+                CopyButton.IsEnabled = RefreshButton.IsEnabled = _password != string.Empty;
                 PasswordTextBlock.Text = _mainCharset.Any() ? InsertZWSP(_password) : CHARSET_EMPTY_MESSAGE;
                 TestProgram();
                 _open = true;
@@ -282,18 +283,18 @@
                 // Test charsetMin minimum
                 Debug.Assert(charsetMin.Minimum == 0);
 
-                // Charset not empty iff charset enabled
-                Debug.Assert(charset.Any() == charsetMin.IsEnabled);
+                // Test charsetMin IsEnabled
+                Debug.Assert(charsetMin.IsEnabled == charset.Any());
 
                 if (charsetMin.IsEnabled)
                 {
-                    // Fractional part must be zero
+                    // Validate charsetMin input (fractional part must be zero)
                     Debug.Assert(charsetMin.Value == (int) charsetMin.Value);
 
-                    // Test length per charset
+                    // Test charsetMin value
                     Debug.Assert(_password.Count(character => charset.Contains(character)) >= charsetMin.Value);
 
-                    // Test charsetMin maximum (invariant #2)
+                    // Test charsetMin maximum
                     Debug.Assert(charsetMin.Maximum - charsetMin.Value == PasswordLengthSlider.Value - PasswordLengthSlider.Minimum);
                     
                     enabledCharsetMinSum += charsetMin.Value;
@@ -302,16 +303,14 @@
                     Debug.Assert(double.IsNaN(charsetMin.Value));
             }
 
+            // Test empty charset
             Debug.Assert(mainCharset.Any() == (PasswordTextBlock.Text != CHARSET_EMPTY_MESSAGE));
 
-            // Test minimum length (invariant #1)
-            Debug.Assert(PasswordLengthSlider.Minimum == enabledCharsetMinSum);
-
-            // Test length
-            Debug.Assert(_password.Length == (int) PasswordLengthSlider.Value);
-
-            // Test maximum length
+            // Test PasswordLengthSlider maximum, value and minimum
             Debug.Assert(PasswordLengthSlider.Maximum == BYTE_RANGE);
+            if (mainCharset.Any())
+                Debug.Assert(PasswordLengthSlider.Value == _password.Length);
+            Debug.Assert(PasswordLengthSlider.Minimum == enabledCharsetMinSum);
         }
 
 
@@ -333,11 +332,8 @@
         private readonly DataPackage _dataPackage = new DataPackage();
         private void CopyButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_password != string.Empty)
-            {
-                _dataPackage.SetText(_password);
-                Clipboard.SetContent(_dataPackage);
-            }
+            _dataPackage.SetText(_password);
+            Clipboard.SetContent(_dataPackage);
         }
 
         private void SaveSettings_Click(object sender, RoutedEventArgs e)
