@@ -85,7 +85,7 @@
                 <Slider
                     x:Name="PasswordLengthSlider"
                     Maximum="256"
-                    Value="16"
+                    Value="{x:Bind local:SettingsPage.DEFAULT_LENGTH}"
                     Minimum="4"
                     Header="Length"/>
                 <TextBox MaxLength="95" x:Name="IncludeTextBox" Header="Include" Margin="0,24"/>
