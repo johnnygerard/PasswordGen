@@ -88,7 +88,7 @@
                     Value="{x:Bind local:SettingsPage.DEFAULT_LENGTH}"
                     Minimum="4"
                     Header="Length"/>
-                <TextBox MaxLength="95" x:Name="IncludeTextBox" Header="Include" Margin="0,24"/>
+                <TextBox MaxLength="95" x:Name="IncludeTextBox" Header="Include" Margin="0,24,0,16"/>
                 <TextBox MaxLength="95" x:Name="ExcludeTextBox" Header="Exclude"/>
             </StackPanel>
             <Grid x:Name="SwitchContainer" Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center">
