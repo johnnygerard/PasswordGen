@@ -25,7 +25,7 @@
         private const string HOME_PAGE_SETTINGS = nameof(HOME_PAGE_SETTINGS);
         private const string LENGTH = nameof(LENGTH);
 
-        private readonly IDictionary<string, object> _homeSettings;
+        private readonly IDictionary<string, object> _homePageSettings;
         private readonly ReadOnlyCollection<ToggleSwitch> _toggleSwitches;
         private readonly HashSet<ToggleSwitch> _toggleSwitchesOn;
         private readonly Dictionary<string, PasswordDataEntry> _passwordData;
@@ -34,7 +34,7 @@
         public HomePage()
         {
             InitializeComponent();
-            _homeSettings = ApplicationData.Current.LocalSettings.CreateContainer(HOME_PAGE_SETTINGS, ApplicationDataCreateDisposition.Always).Values;
+            _homePageSettings = ApplicationData.Current.LocalSettings.CreateContainer(HOME_PAGE_SETTINGS, ApplicationDataCreateDisposition.Always).Values;
             _toggleSwitches = new ReadOnlyCollection<ToggleSwitch>(new ToggleSwitch[]
             {
                 DigitSwitch,
@@ -56,7 +56,7 @@
                 toggleSwitch.Toggled += ToggleSwitch_Toggled;
             PasswordLengthSlider.ValueChanged += PasswordLengthSlider_ValueChanged;
 
-            if (_homeSettings.Any())
+            if (_homePageSettings.Any())
                 ApplyUserSettings();
             else
                 RefreshPassword();
@@ -165,13 +165,13 @@
         private void SaveSettings_Click(object sender, RoutedEventArgs e)
         {
             foreach (var toggleSwitch in _toggleSwitches)
-                _homeSettings[(string) toggleSwitch.Tag] = toggleSwitch.IsOn;
-            _homeSettings[LENGTH] = (int) PasswordLengthSlider.Value;
+                _homePageSettings[(string) toggleSwitch.Tag] = toggleSwitch.IsOn;
+            _homePageSettings[LENGTH] = (int) PasswordLengthSlider.Value;
         }
 
         private void ResetButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_homeSettings.Any())
+            if (_homePageSettings.Any())
                 ApplyUserSettings();
             else
             {
@@ -185,16 +185,16 @@
         {
             // Turn a ToggleSwitch on first to avoid all ToggleSwitches being turned off
             foreach (var toggleSwitch in _toggleSwitches)
-                if ((bool) _homeSettings[(string) toggleSwitch.Tag])
+                if ((bool) _homePageSettings[(string) toggleSwitch.Tag])
                 {
                     toggleSwitch.IsOn = true;
                     break;
                 }
 
             foreach (var toggleSwitch in _toggleSwitches)
-                toggleSwitch.IsOn = (bool) _homeSettings[(string) toggleSwitch.Tag];
+                toggleSwitch.IsOn = (bool) _homePageSettings[(string) toggleSwitch.Tag];
 
-            PasswordLengthSlider.Value = (int) _homeSettings[LENGTH];
+            PasswordLengthSlider.Value = (int) _homePageSettings[LENGTH];
         }
     }
 }
