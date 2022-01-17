@@ -49,8 +49,6 @@
             if (!localSettings.Values.ContainsKey(VERSION) || (string) localSettings.Values[VERSION] != versionNumber)
             {
                 localSettings.Values[VERSION] = versionNumber;
-                localSettings.CreateContainer(HOME_PAGE_SETTINGS, ApplicationDataCreateDisposition.Always);
-                localSettings.CreateContainer(ADVANCED_PAGE_SETTINGS, ApplicationDataCreateDisposition.Always);
                 InitializeHomePageSettings();
                 InitializeAdvancedPageSettings();
             }

@@ -71,8 +71,6 @@
             // Page_Loaded removes itself to execute on first load only.
             ((Page) Frame.Content).Loaded -= Page_Loaded;
 
-
-
             // Attach event handlers
             foreach (var toggleButton in _toggleButtons)
             {

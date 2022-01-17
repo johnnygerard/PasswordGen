@@ -26,13 +26,11 @@
         internal static readonly IDictionary<string, object> _homePageSettings;
         internal static readonly IDictionary<string, object> _advancedPageSettings;
 
-
         static SettingsPage()
         {
-            _homePageSettings = _localSettings.CreateContainer(HOME_PAGE_SETTINGS, ApplicationDataCreateDisposition.Existing).Values;
-            _advancedPageSettings = _localSettings.CreateContainer(ADVANCED_PAGE_SETTINGS, ApplicationDataCreateDisposition.Existing).Values;
+            _homePageSettings = _localSettings.CreateContainer(HOME_PAGE_SETTINGS, ApplicationDataCreateDisposition.Always).Values;
+            _advancedPageSettings = _localSettings.CreateContainer(ADVANCED_PAGE_SETTINGS, ApplicationDataCreateDisposition.Always).Values;
         }
-
         public SettingsPage() => InitializeComponent();
 
         internal static void InitializeHomePageSettings()
