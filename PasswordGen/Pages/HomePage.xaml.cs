@@ -82,7 +82,7 @@
                     case 2:
                         CopyButton_Click(null, null);
                         break;
-                    case 32:
+                    case 3:
                         RefreshButton_Click(null, null);
                         break;
                     case 4:
