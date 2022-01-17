@@ -1,5 +1,6 @@
 ﻿namespace PasswordGen.Pages
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
@@ -9,7 +10,6 @@
     using Utilities;
 
     using Windows.ApplicationModel.DataTransfer;
-    using Windows.Storage;
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Controls.Primitives;
@@ -23,6 +23,7 @@
         // Throttle delay of 4 ms to match a monitor refresh rate of 240 Hz.
         private const int THROTTLE_DELAY = 4;
         private const string DEBUG = nameof(DEBUG);
+        private const string TEST = nameof(TEST);
 
         private readonly ReadOnlyCollection<ToggleSwitch> _toggleSwitches;
         private readonly HashSet<ToggleSwitch> _toggleSwitchesOn;
@@ -55,6 +56,47 @@
 
             ApplyUserSettings();
             RefreshPassword();
+            SimulateUserInput();
+        }
+
+        [Conditional(TEST)]
+        private async void SimulateUserInput()
+        {
+            var rng = new Random();
+            var stopwatch = Stopwatch.StartNew();
+            int userActionsCount = 0;
+
+            while (stopwatch.ElapsedMilliseconds < 5000)
+            {
+                switch (rng.Next(6))
+                {
+                    case 0:
+                        PasswordLengthSlider.Value = rng.Next((int) PasswordLengthSlider.Minimum, (int) PasswordLengthSlider.Maximum + 1);
+                        break;
+                    case 1:
+                        var toggleSwitch = _toggleSwitches[rng.Next(_toggleSwitches.Count)];
+
+                        if (toggleSwitch.IsEnabled)
+                            toggleSwitch.IsOn = !toggleSwitch.IsOn;
+                        break;
+                    case 2:
+                        CopyButton_Click(null, null);
+                        break;
+                    case 32:
+                        RefreshButton_Click(null, null);
+                        break;
+                    case 4:
+                        ResetButton_Click(null, null);
+                        break;
+                    case 5:
+                        SaveSettings_Click(null, null);
+                        break;
+                }
+                userActionsCount++;
+                await Task.Delay(1);
+            }
+            stopwatch.Stop();
+            Debug.WriteLine($"userActionsCount: {userActionsCount}");
         }
 
         private ToggleSwitch _disabledToggleSwitch;
