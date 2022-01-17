@@ -4,6 +4,7 @@
 
     using PasswordGen.Utilities;
 
+    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
@@ -27,6 +28,7 @@
         // Throttle delay of 4 ms to match a monitor refresh rate of 240 Hz.
         private const int THROTTLE_DELAY = 4;
         private const string DEBUG = nameof(DEBUG);
+        private const string TEST = nameof(TEST);
         private const char ZWSP = '\u200B'; // ZERO WIDTH SPACE
         private const string CHARSET_EMPTY_MESSAGE = "CHARACTER SET EMPTY";
 
@@ -85,6 +87,72 @@
 
             ApplyUserSettings();
             RefreshPassword();
+            SimulateUserInput();
+        }
+
+        [Conditional(TEST)]
+        private async void SimulateUserInput()
+        {
+            var rng = new Random();
+            var stopwatch = Stopwatch.StartNew();
+            int userActionsCount = 0;
+
+            while (stopwatch.ElapsedMilliseconds < 15000)
+            {
+                switch (rng.Next(9))
+                {
+                    case 0:
+                        PasswordLengthSlider.Value = rng.Next((int) PasswordLengthSlider.Minimum, (int) PasswordLengthSlider.Maximum + 1);
+                        break;
+                    case 1:
+                        var toggleButton = _toggleButtons[rng.Next(_toggleButtons.Count)];
+
+                        if (toggleButton.IsEnabled)
+                            toggleButton.IsChecked = !toggleButton.IsChecked;
+                        break;
+                    case 2:
+                        if (CopyButton.IsEnabled)
+                            CopyButton_Click(null, null);
+                        break;
+                    case 3:
+                        if (RefreshButton.IsEnabled)
+                            RefreshButton_Click(null, null);
+                        break;
+                    case 4:
+                        ResetButton_Click(null, null);
+                        break;
+                    case 5:
+                        SaveSettings_Click(null, null);
+                        break;
+                    case 6:
+                        IncludeTextBox.Text = GetRandomString(rng.Next(1, 95));
+                        break;
+                    case 7:
+                        ExcludeTextBox.Text = GetRandomString(rng.Next(1, 95));
+                        break;
+                    case 8:
+                        NumberBox randomCharsetMin = _charsetMins[_charsetKeys[rng.Next(4)]];
+
+                        if (randomCharsetMin.IsEnabled)
+                            randomCharsetMin.Value = rng.Next((int) randomCharsetMin.Maximum + 1);
+                        break;
+                }
+                userActionsCount++;
+                await Task.Delay(1);
+            }
+            stopwatch.Stop();
+            Debug.WriteLine($"userActionsCount: {userActionsCount}");
+
+            string GetRandomString(int length)
+            {
+                var randomString = new StringBuilder(length);
+
+                for (int i = 0; i < length; i++)
+                {
+                    randomString.Append((char) rng.Next(128));
+                }
+                return randomString.ToString();
+            }
         }
 
         private void ToggleButton_Checked(object sender, RoutedEventArgs e) => ToggleButton_Toggled(sender, true);
