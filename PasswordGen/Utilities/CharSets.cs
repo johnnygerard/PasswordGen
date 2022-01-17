@@ -14,9 +14,9 @@
 
         // charset keys
         internal const string DIGITS = nameof(DIGITS);
+        internal const string SYMBOLS = nameof(SYMBOLS);
         internal const string LOWERCASE = nameof(LOWERCASE);
         internal const string UPPERCASE = nameof(UPPERCASE);
-        internal const string SYMBOLS = nameof(SYMBOLS);
 
         /// <summary>
         /// ASCII charset without C0, SPACE and DEL characters.
@@ -26,9 +26,9 @@
         internal static readonly string[] _charsetKeys = new string[]
         {
             DIGITS,
+            SYMBOLS,
             LOWERCASE,
             UPPERCASE,
-            SYMBOLS,
         };
 
         static Charsets()
@@ -46,9 +46,9 @@
             _fullCharsets = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
             {
                 { DIGITS, digits},
+                { SYMBOLS, string.Join(null, symbols) },
                 { LOWERCASE, lowercase},
                 { UPPERCASE, uppercase},
-                { SYMBOLS, string.Join(null, symbols) }
             });
         }
 

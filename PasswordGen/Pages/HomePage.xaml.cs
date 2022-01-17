@@ -14,6 +14,7 @@
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Controls.Primitives;
 
+    using static SettingsPage;
     using static Utilities.Charsets;
     using static Utilities.PasswordBuilder;
 
@@ -22,10 +23,7 @@
         // Throttle delay of 4 ms to match a monitor refresh rate of 240 Hz.
         private const int THROTTLE_DELAY = 4;
         private const string DEBUG = nameof(DEBUG);
-        private const string HOME_PAGE_SETTINGS = nameof(HOME_PAGE_SETTINGS);
-        private const string LENGTH = nameof(LENGTH);
 
-        private readonly IDictionary<string, object> _homePageSettings;
         private readonly ReadOnlyCollection<ToggleSwitch> _toggleSwitches;
         private readonly HashSet<ToggleSwitch> _toggleSwitchesOn;
         private readonly Dictionary<string, PasswordDataEntry> _passwordData;
@@ -34,7 +32,6 @@
         public HomePage()
         {
             InitializeComponent();
-            _homePageSettings = ApplicationData.Current.LocalSettings.CreateContainer(HOME_PAGE_SETTINGS, ApplicationDataCreateDisposition.Always).Values;
             _toggleSwitches = new ReadOnlyCollection<ToggleSwitch>(new ToggleSwitch[]
             {
                 DigitSwitch,
@@ -56,10 +53,8 @@
                 toggleSwitch.Toggled += ToggleSwitch_Toggled;
             PasswordLengthSlider.ValueChanged += PasswordLengthSlider_ValueChanged;
 
-            if (_homePageSettings.Any())
-                ApplyUserSettings();
-            else
-                RefreshPassword();
+            ApplyUserSettings();
+            RefreshPassword();
         }
 
         private ToggleSwitch _disabledToggleSwitch;
@@ -169,21 +164,11 @@
             _homePageSettings[LENGTH] = (int) PasswordLengthSlider.Value;
         }
 
-        private void ResetButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (_homePageSettings.Any())
-                ApplyUserSettings();
-            else
-            {
-                foreach (var toggleSwitch in _toggleSwitches)
-                    toggleSwitch.IsOn = true;
-                PasswordLengthSlider.Value = SettingsPage.DEFAULT_LENGTH;
-            }
-        }
+        private void ResetButton_Click(object sender, RoutedEventArgs e) => ApplyUserSettings();
 
         private void ApplyUserSettings()
         {
-            // Turn a ToggleSwitch on first to avoid all ToggleSwitches being turned off
+            // Turn a ToggleSwitch on first to avoid validation conflicts
             foreach (var toggleSwitch in _toggleSwitches)
                 if ((bool) _homePageSettings[(string) toggleSwitch.Tag])
                 {

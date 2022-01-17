@@ -1,5 +1,9 @@
 ﻿namespace PasswordGen.Pages
 {
+    using Microsoft.UI.Xaml.Controls;
+
+    using PasswordGen.Utilities;
+
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
@@ -7,16 +11,14 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    using Microsoft.UI.Xaml.Controls;
-
-    using PasswordGen.Utilities;
-
     using Windows.ApplicationModel.DataTransfer;
     using Windows.Globalization.NumberFormatting;
+    using Windows.Storage;
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Controls.Primitives;
 
+    using static SettingsPage;
     using static Utilities.Charsets;
     using static Utilities.PasswordBuilder;
 
@@ -66,6 +68,11 @@
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            // Page_Loaded removes itself to execute on first load only.
+            ((Page) Frame.Content).Loaded -= Page_Loaded;
+
+
+
             // Attach event handlers
             foreach (var toggleButton in _toggleButtons)
             {
@@ -78,10 +85,8 @@
             ExcludeTextBox.TextChanging += ExcludeTextBox_TextChanging;
             PasswordLengthSlider.ValueChanged += PasswordLengthSlider_ValueChanged;
 
+            ApplyUserSettings();
             RefreshPassword();
-
-            // Page_Loaded removes itself to execute on first load only.
-            ((Page) Frame.Content).Loaded -= Page_Loaded;
         }
 
         private void ToggleButton_Checked(object sender, RoutedEventArgs e) => ToggleButton_Toggled(sender, true);
@@ -163,7 +168,7 @@
 
         private void UpdatePasswordDataCharset(IEnumerable<char> charset, string charsetKey, bool included)
         {
-            var passwordDataEntry = _passwordData[charsetKey];
+            PasswordDataEntry passwordDataEntry = _passwordData[charsetKey];
             string fullCharset = _fullCharsets[charsetKey];
 
             passwordDataEntry.Charset = included ? fullCharset.Intersect(charset) : fullCharset.Except(charset);
@@ -178,7 +183,7 @@
             sender.Text = string.Join(null, includedCharset);
             foreach (var toggleButton in _toggleButtons.Where(toggleButton => !(bool) toggleButton.IsChecked))
             {
-                string charsetKey = (string) toggleButton.Tag;
+                var charsetKey = (string) toggleButton.Tag;
                 NumberBox charsetMin = _charsetMins[charsetKey];
 
                 UpdatePasswordDataCharset(sender.Text, charsetKey, true);
@@ -238,7 +243,7 @@
             {
                 var wrappedPassword = new StringBuilder(password.Length * 2);
 
-                foreach (var character in password)
+                foreach (char character in password)
                     wrappedPassword.Append($"{character}{ZWSP}");
                 return wrappedPassword.ToString();
             }
@@ -296,7 +301,7 @@
 
                     // Test charsetMin maximum
                     Debug.Assert(charsetMin.Maximum - charsetMin.Value == PasswordLengthSlider.Value - PasswordLengthSlider.Minimum);
-                    
+
                     enabledCharsetMinSum += charsetMin.Value;
                 }
                 else
@@ -316,7 +321,7 @@
 
         private void PasswordLengthSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
-            var delta = (int) (e.NewValue - e.OldValue);
+            int delta = (int) (e.NewValue - e.OldValue);
 
             _passwordData[MAIN_CHARSET].Length += delta;
 
@@ -338,12 +343,50 @@
 
         private void SaveSettings_Click(object sender, RoutedEventArgs e)
         {
+            _advancedPageSettings[LENGTH] = (int) PasswordLengthSlider.Value;
+            _advancedPageSettings[INCLUDED_CHARSET] = IncludeTextBox.Text;
+            _advancedPageSettings[EXCLUDED_CHARSET] = ExcludeTextBox.Text;
 
+            foreach (var toggleButton in _toggleButtons)
+            {
+                var charsetKey = (string) toggleButton.Tag;
+
+                _advancedPageSettings[charsetKey] = new ApplicationDataCompositeValue
+                {
+                    { ON, (bool) toggleButton.IsChecked },
+                    { MINIMUM_LENGTH, _charsetMins[charsetKey].Value },
+                };
+            }
         }
 
-        private void ResetButton_Click(object sender, RoutedEventArgs e)
-        {
+        private void ResetButton_Click(object sender, RoutedEventArgs e) => ApplyUserSettings();
 
+        private void ApplyUserSettings()
+        {
+            // Put these controls into a blank state to avoid validation conflicts
+            IncludeTextBox.Text = string.Empty;
+            ExcludeTextBox.Text = string.Empty;
+            foreach (NumberBox charsetMin in _charsetMins.Values)
+                charsetMin.Value = 0;
+
+            IncludeTextBox.Text = (string) _advancedPageSettings[INCLUDED_CHARSET];
+            ExcludeTextBox.Text = (string) _advancedPageSettings[EXCLUDED_CHARSET];
+            PasswordLengthSlider.Value = (int) _advancedPageSettings[LENGTH];
+
+            foreach (var toggleButton in _toggleButtons)
+            {
+                var charsetKey = (string) toggleButton.Tag;
+                var charset = (ApplicationDataCompositeValue) _advancedPageSettings[charsetKey];
+
+                toggleButton.IsChecked = (bool) charset[ON];
+            }
+
+            foreach (var charsetKey in _charsetKeys)
+            {
+                var charset = (ApplicationDataCompositeValue) _advancedPageSettings[charsetKey];
+
+                _charsetMins[charsetKey].Value = (double) charset[MINIMUM_LENGTH];
+            }
         }
     }
 }
