@@ -97,7 +97,7 @@
             var stopwatch = Stopwatch.StartNew();
             int userActionsCount = 0;
 
-            while (stopwatch.ElapsedMilliseconds < 15000)
+            while (stopwatch.ElapsedMilliseconds < 5000)
             {
                 switch (rng.Next(9))
                 {
