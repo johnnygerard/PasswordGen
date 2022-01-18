@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
+    RequestedTheme="{x:Bind AppRequestedTheme, Mode=OneWay}"
     Background="{ThemeResource AcrylicBackground}">
     <Grid>
         <Grid.RowDefinitions>

@@ -1,6 +1,8 @@
 ﻿namespace PasswordGen
 {
     using System;
+    using System.ComponentModel;
+    using System.Runtime.CompilerServices;
 
     using Windows.ApplicationModel;
     using Windows.ApplicationModel.Core;
@@ -10,10 +12,12 @@
 
     using MUXC = Microsoft.UI.Xaml.Controls;
 
-    public sealed partial class MainPage : Page
+    public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
-        private readonly MUXC.NavigationViewItem _startPage;
+        // Window's title
         private readonly string _displayName = Package.Current.DisplayName;
+
+        private readonly MUXC::NavigationViewItem _startPage;
 
         public MainPage()
         {
@@ -58,17 +62,39 @@
             => AppTitleBar.Visibility = sender.IsVisible ? Visibility.Visible : Visibility.Collapsed;
 
         private void NavigationView_Loaded(object sender, RoutedEventArgs e)
-            => ((MUXC.NavigationView) sender).SelectedItem = _startPage;
+            => ((MUXC::NavigationView) sender).SelectedItem = _startPage;
 
-        private void NavigationView_SelectionChanged(MUXC.NavigationView sender, MUXC.NavigationViewSelectionChangedEventArgs args)
+        private void NavigationView_SelectionChanged(MUXC::NavigationView sender, MUXC::NavigationViewSelectionChangedEventArgs args)
         {
-            var selectedItem = (MUXC.NavigationViewItem) args.SelectedItem;
-            Type sourcePageType =
-                args.IsSettingsSelected
+            var selectedItem = (MUXC::NavigationViewItem) args.SelectedItem;
+            Type sourcePageType = args.IsSettingsSelected
                 ? typeof(Pages.SettingsPage)
                 : Type.GetType($"PasswordGen.Pages.{selectedItem.Name}");
 
             MainFrame.Navigate(sourcePageType, null, args.RecommendedNavigationTransitionInfo);
         }
+
+
+
+        #region Theme
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged([CallerMemberName] string propertyName = default)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        private ElementTheme _appRequestedTheme;
+        internal ElementTheme AppRequestedTheme
+        {
+            get => _appRequestedTheme;
+            set
+            {
+                if (_appRequestedTheme != value)
+                {
+                    _appRequestedTheme = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        #endregion
     }
 }

@@ -5,10 +5,16 @@
     xmlns:local="using:PasswordGen.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
     NavigationCacheMode="Required">
     <Grid Padding="32">
         <StackPanel>
+            <muxc:RadioButtons Header="Theme" SelectedIndex="0" SelectionChanged="Theme_SelectionChanged">
+                <RadioButton Content="{x:Bind DEFAULT_THEME_NAME}"/>
+                <RadioButton Content="{x:Bind LIGHT_THEME_NAME}"/>
+                <RadioButton Content="{x:Bind DARK_THEME_NAME}"/>
+            </muxc:RadioButtons>
             <Button Click="ResetButton_Click">Reset</Button>
         </StackPanel>
     </Grid>

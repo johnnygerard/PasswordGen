@@ -1,14 +1,21 @@
 ﻿namespace PasswordGen.Pages
 {
+    using Microsoft.UI.Xaml.Controls;
+
     using System.Collections.Generic;
 
     using Windows.Storage;
+    using Windows.UI.Xaml;
     using Windows.UI.Xaml.Controls;
 
     using static Utilities.Charsets;
 
     public sealed partial class SettingsPage : Page
     {
+        private readonly string DEFAULT_THEME_NAME = "System";
+        private readonly string LIGHT_THEME_NAME = "Light";
+        private readonly string DARK_THEME_NAME = "Dark";
+
         // Default values
         internal const int DEFAULT_LENGTH = 16;
         internal const double DEFAULT_CHARSET_MINIMUM = 1;
@@ -21,7 +28,6 @@
         internal const string ON = nameof(ON);
         internal const string INCLUDED_CHARSET = nameof(INCLUDED_CHARSET);
         internal const string EXCLUDED_CHARSET = nameof(EXCLUDED_CHARSET);
-
         private static readonly ApplicationDataContainer _localSettings = ApplicationData.Current.LocalSettings;
         internal static readonly IDictionary<string, object> _homePageSettings;
         internal static readonly IDictionary<string, object> _advancedPageSettings;
@@ -58,6 +64,21 @@
         {
             InitializeHomePageSettings();
             InitializeAdvancedPageSettings();
+        }
+
+        private void Theme_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var rootFrame = (Frame) Window.Current.Content;
+            var radioButtons = (RadioButtons) sender;
+
+            if (radioButtons.SelectedItem is RadioButton theme)
+            {
+                var themeName = (string) theme.Content;
+
+                ((MainPage) rootFrame.Content).AppRequestedTheme =
+                    themeName == LIGHT_THEME_NAME ? ElementTheme.Light :
+                    themeName == DARK_THEME_NAME ? ElementTheme.Dark : ElementTheme.Default;
+            }
         }
     }
 }
