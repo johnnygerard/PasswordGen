@@ -12,7 +12,7 @@
 
     using MUXC = Microsoft.UI.Xaml.Controls;
 
-    public sealed partial class MainPage : Page, INotifyPropertyChanged
+    public sealed partial class MainPage : Page
     {
         // Window's title
         private readonly string _displayName = Package.Current.DisplayName;
@@ -74,28 +74,5 @@
 
             MainFrame.Navigate(sourcePageType, null, args.RecommendedNavigationTransitionInfo);
         }
-
-
-
-        #region Theme
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void OnPropertyChanged([CallerMemberName] string propertyName = default)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-        private ElementTheme _appRequestedTheme;
-        internal ElementTheme AppRequestedTheme
-        {
-            get => _appRequestedTheme;
-            set
-            {
-                if (_appRequestedTheme != value)
-                {
-                    _appRequestedTheme = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        #endregion
     }
 }

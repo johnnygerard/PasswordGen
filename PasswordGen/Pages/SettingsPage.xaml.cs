@@ -68,14 +68,11 @@
 
         private void Theme_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var rootFrame = (Frame) Window.Current.Content;
-            var radioButtons = (RadioButtons) sender;
-
-            if (radioButtons.SelectedItem is RadioButton theme)
+            if (((RadioButtons) sender).SelectedItem is RadioButton theme)
             {
                 var themeName = (string) theme.Content;
 
-                ((MainPage) rootFrame.Content).AppRequestedTheme =
+                ((Frame) Window.Current.Content).RequestedTheme =
                     themeName == LIGHT_THEME_NAME ? ElementTheme.Light :
                     themeName == DARK_THEME_NAME ? ElementTheme.Dark : ElementTheme.Default;
             }
