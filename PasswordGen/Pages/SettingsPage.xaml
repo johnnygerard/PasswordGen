@@ -8,14 +8,17 @@
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
     NavigationCacheMode="Required">
-    <Grid Padding="32">
-        <StackPanel>
-            <muxc:RadioButtons Header="Theme" SelectedIndex="0" SelectionChanged="Theme_SelectionChanged">
+    <Grid Padding="16">
+        <StackPanel Spacing="16">
+            <muxc:RadioButtons SelectedIndex="0" SelectionChanged="Theme_SelectionChanged">
+                <muxc:RadioButtons.Header>
+                    <TextBlock Text="Theme" FontWeight="SemiBold" FontSize="14"/>
+                </muxc:RadioButtons.Header>
                 <RadioButton Tag="Default" Content="{x:Bind DEFAULT_THEME_NAME}"/>
                 <RadioButton Tag="Light" Content="{x:Bind LIGHT_THEME_NAME}"/>
                 <RadioButton Tag="Dark" Content="{x:Bind DARK_THEME_NAME}"/>
             </muxc:RadioButtons>
-            <Button Click="ResetButton_Click">Reset</Button>
+            <Button Click="ResetButton_Click">Reset all settings</Button>
         </StackPanel>
     </Grid>
 </Page>
