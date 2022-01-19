@@ -2,6 +2,7 @@
 {
     using Microsoft.UI.Xaml.Controls;
 
+    using System;
     using System.Collections.Generic;
 
     using Windows.Storage;
@@ -68,14 +69,10 @@
 
         private void Theme_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (((RadioButtons) sender).SelectedItem is RadioButton theme)
-            {
-                var themeName = (string) theme.Content;
+            var radioButtons = (RadioButtons) sender;
 
-                ((Frame) Window.Current.Content).RequestedTheme =
-                    themeName == LIGHT_THEME_NAME ? ElementTheme.Light :
-                    themeName == DARK_THEME_NAME ? ElementTheme.Dark : ElementTheme.Default;
-            }
+            if (radioButtons.SelectedItem is RadioButton theme)
+                ((Frame) Window.Current.Content).RequestedTheme = Enum.Parse<ElementTheme>((string) theme.Tag);
         }
     }
 }
