@@ -12,7 +12,10 @@
         <StackPanel Spacing="16">
             <muxc:RadioButtons SelectedIndex="0" SelectionChanged="Theme_SelectionChanged">
                 <muxc:RadioButtons.Header>
-                    <TextBlock Text="Theme" FontWeight="SemiBold" FontSize="14"/>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" Glyph="&#xE790;"/>
+                        <TextBlock Text="Theme" FontWeight="SemiBold" FontSize="14"/>
+                    </StackPanel>
                 </muxc:RadioButtons.Header>
                 <RadioButton Tag="Default" Content="{x:Bind DEFAULT_THEME_NAME}"/>
                 <RadioButton Tag="Light" Content="{x:Bind LIGHT_THEME_NAME}"/>
