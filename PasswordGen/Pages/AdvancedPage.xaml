@@ -100,6 +100,7 @@
                         <Setter Property="VerticalAlignment" Value="Top"/>
                     </Style>
                     <Style TargetType="muxc:NumberBox">
+                        <Setter Property="Foreground" Value="{ThemeResource DefaultTextForegroundThemeBrush}"/>
                         <Setter Property="Maximum" Value="13"/>
                         <Setter Property="Value" Value="1"/>
                         <Setter Property="Minimum" Value="0"/>
