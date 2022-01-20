@@ -47,7 +47,6 @@
                 InitializeHomePageSettings();
                 InitializeAdvancedPageSettings();
             }
-            //ApplyTheme();
         }
 
         /// <summary>

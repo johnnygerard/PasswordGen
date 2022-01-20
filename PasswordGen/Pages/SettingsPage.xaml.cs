@@ -1,6 +1,5 @@
 ﻿namespace PasswordGen.Pages
 {
-    using Microsoft.UI.Xaml.Controls;
 
     using System;
     using System.Collections.Generic;
@@ -94,19 +93,32 @@
             var rootFrame = (Frame) Window.Current.Content;
 
             rootFrame.RequestedTheme = Enum.Parse<ElementTheme>((string) _localSettings.Values[THEME]);
+            bool isDarkTheme = rootFrame.RequestedTheme == ElementTheme.Dark ||
+                (rootFrame.RequestedTheme == ElementTheme.Default && Application.Current.RequestedTheme == ApplicationTheme.Dark);
             // Update title bar buttons
-            switch (rootFrame.RequestedTheme)
+            if (isDarkTheme)
             {
-                case ElementTheme.Default:
-                    titleBar.ButtonForegroundColor = Application.Current.RequestedTheme == ApplicationTheme.Light ? Colors.Black : Colors.White;
-                    break;
-                case ElementTheme.Light:
-                    titleBar.ButtonForegroundColor = Colors.Black;
-                    break;
-                case ElementTheme.Dark:
-                    titleBar.ButtonForegroundColor = Colors.White;
-                    break;
+                titleBar.ButtonForegroundColor = Colors.White;
+                titleBar.ButtonHoverForegroundColor = Colors.White;
+                titleBar.ButtonHoverBackgroundColor = GetColor(0x2D);
+                titleBar.InactiveForegroundColor = GetColor(0x72);
+                titleBar.ButtonPressedForegroundColor = GetColor(0xA7);
+                titleBar.ButtonPressedBackgroundColor = GetColor(0x29);
             }
+            else
+            {
+                titleBar.ButtonForegroundColor = Colors.Black;
+                titleBar.ButtonHoverForegroundColor = Colors.Black;
+                titleBar.ButtonHoverBackgroundColor = GetColor(0xE9);
+                titleBar.InactiveForegroundColor = GetColor(0x9C);
+                titleBar.ButtonPressedForegroundColor = GetColor(0x5F);
+                titleBar.ButtonPressedBackgroundColor = GetColor(0xED);
+            }
+            titleBar.ButtonBackgroundColor = Colors.Transparent;
+            titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
+
+            // Get an opaque gray color.
+            Color GetColor(byte value) => new Color { A = byte.MaxValue, R = value, G = value, B = value };
         }
     }
 }

@@ -1,14 +1,11 @@
 ﻿namespace PasswordGen
 {
+    using PasswordGen.Pages;
+
     using System;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Runtime.CompilerServices;
 
     using Windows.ApplicationModel;
     using Windows.ApplicationModel.Core;
-    using Windows.UI;
-    using Windows.UI.ViewManagement;
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Controls;
 
@@ -26,9 +23,7 @@
             InitializeComponent();
             _startPage = HomePage;
 
-            ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
-            titleBar.ButtonBackgroundColor = Colors.Transparent;
-            titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
+            SettingsPage.ApplyTheme();
 
             // Hide default title bar.
             CoreApplicationViewTitleBar coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
