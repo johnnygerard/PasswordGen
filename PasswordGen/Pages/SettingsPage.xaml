@@ -10,16 +10,16 @@
     NavigationCacheMode="Required">
     <Grid Padding="16">
         <StackPanel Spacing="16">
-            <muxc:RadioButtons SelectedIndex="0" SelectionChanged="Theme_SelectionChanged">
+            <muxc:RadioButtons x:Name="ThemeSettings">
                 <muxc:RadioButtons.Header>
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" Glyph="&#xE790;"/>
-                        <TextBlock Text="Theme" FontWeight="SemiBold" FontSize="14"/>
+                        <TextBlock Text="Theme" FontWeight="SemiBold" FontSize="15"/>
                     </StackPanel>
                 </muxc:RadioButtons.Header>
-                <RadioButton Tag="Default" Content="{x:Bind DEFAULT_THEME_NAME}"/>
-                <RadioButton Tag="Light" Content="{x:Bind LIGHT_THEME_NAME}"/>
-                <RadioButton Tag="Dark" Content="{x:Bind DARK_THEME_NAME}"/>
+                <RadioButton Tag="Default" Content="System"/>
+                <RadioButton Tag="Light" Content="Light"/>
+                <RadioButton Tag="Dark" Content="Dark"/>
             </muxc:RadioButtons>
             <Button Click="ResetButton_Click">Reset all settings</Button>
         </StackPanel>

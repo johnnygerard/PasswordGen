@@ -5,6 +5,8 @@
     using Windows.ApplicationModel;
     using Windows.ApplicationModel.Activation;
     using Windows.Storage;
+    using Windows.UI;
+    using Windows.UI.ViewManagement;
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Navigation;
@@ -28,6 +30,46 @@
             Suspending += OnSuspending;
         }
 
+        private void InitSettings()
+        {
+            ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
+            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+            var rootFrame = (Frame) Window.Current.Content;
+            PackageVersion version = Package.Current.Id.Version;
+            string versionNumber = $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+
+            #region Remove all settings
+#if false
+            localSettings.Values.Clear();
+            foreach (string containerKey in localSettings.Containers.Keys)
+                localSettings.DeleteContainer(containerKey);
+#endif 
+            #endregion
+
+            if (!localSettings.Values.ContainsKey(VERSION) || (string) localSettings.Values[VERSION] != versionNumber)
+            {
+                localSettings.Values.Add(VERSION, versionNumber);
+                localSettings.Values.Add(THEME, ElementTheme.Default.ToString());
+                InitializeHomePageSettings();
+                InitializeAdvancedPageSettings();
+            }
+
+            // Restore theme from user settings
+            rootFrame.RequestedTheme = Enum.Parse<ElementTheme>((string) localSettings.Values[THEME]);
+            switch (rootFrame.RequestedTheme)
+            {
+                case ElementTheme.Default:
+                    titleBar.ButtonForegroundColor = RequestedTheme == ApplicationTheme.Light ? Colors.Black : Colors.White;
+                    break;
+                case ElementTheme.Light:
+                    titleBar.ButtonForegroundColor = Colors.Black;
+                    break;
+                case ElementTheme.Dark:
+                    titleBar.ButtonForegroundColor = Colors.White;
+                    break;
+            }
+        }
+
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used such as when the application is launched to open a specific file.
@@ -35,29 +77,11 @@
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-            PackageVersion version = Package.Current.Id.Version;
-            string versionNumber = $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
-
-#if false
-            // Remove all settings
-            localSettings.Values.Clear();
-            foreach (string containerKey in localSettings.Containers.Keys)
-                localSettings.DeleteContainer(containerKey);
-#endif
-
-            if (!localSettings.Values.ContainsKey(VERSION) || (string) localSettings.Values[VERSION] != versionNumber)
-            {
-                localSettings.Values[VERSION] = versionNumber;
-                InitializeHomePageSettings();
-                InitializeAdvancedPageSettings();
-            }
-
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
             // just ensure that the window is active
-            if (rootFrame == null)
+            if (rootFrame is null)
             {
                 // Create a Frame to act as the navigation context and navigate to the first page
                 rootFrame = new Frame();
@@ -71,11 +95,13 @@
 
                 // Place the frame in the current Window
                 Window.Current.Content = rootFrame;
+
+                InitSettings();
             }
 
-            if (e.PrelaunchActivated == false)
+            if (!e.PrelaunchActivated)
             {
-                if (rootFrame.Content == null)
+                if (rootFrame.Content is null)
                 {
                     // When the navigation stack isn't restored navigate to the first page,
                     // configuring the new page by passing required information as a navigation
