@@ -5,8 +5,6 @@
     using Windows.ApplicationModel;
     using Windows.ApplicationModel.Activation;
     using Windows.Storage;
-    using Windows.UI;
-    using Windows.UI.ViewManagement;
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Navigation;
@@ -18,8 +16,6 @@
     /// </summary>
     public sealed partial class App : Application
     {
-        internal const string VERSION = nameof(VERSION);
-
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -32,9 +28,7 @@
 
         private void InitSettings()
         {
-            ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
             ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-            var rootFrame = (Frame) Window.Current.Content;
             PackageVersion version = Package.Current.Id.Version;
             string versionNumber = $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
 
@@ -53,21 +47,7 @@
                 InitializeHomePageSettings();
                 InitializeAdvancedPageSettings();
             }
-
-            // Restore theme from user settings
-            rootFrame.RequestedTheme = Enum.Parse<ElementTheme>((string) localSettings.Values[THEME]);
-            switch (rootFrame.RequestedTheme)
-            {
-                case ElementTheme.Default:
-                    titleBar.ButtonForegroundColor = RequestedTheme == ApplicationTheme.Light ? Colors.Black : Colors.White;
-                    break;
-                case ElementTheme.Light:
-                    titleBar.ButtonForegroundColor = Colors.Black;
-                    break;
-                case ElementTheme.Dark:
-                    titleBar.ButtonForegroundColor = Colors.White;
-                    break;
-            }
+            //ApplyTheme();
         }
 
         /// <summary>

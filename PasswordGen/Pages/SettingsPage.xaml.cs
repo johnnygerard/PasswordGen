@@ -28,6 +28,7 @@
         internal const string INCLUDED_CHARSET = nameof(INCLUDED_CHARSET);
         internal const string EXCLUDED_CHARSET = nameof(EXCLUDED_CHARSET);
         internal const string THEME = nameof(THEME);
+        internal const string VERSION = nameof(VERSION);
 
         private static readonly ApplicationDataContainer _localSettings = ApplicationData.Current.LocalSettings;
         internal static readonly IDictionary<string, object> _homePageSettings;
@@ -79,25 +80,32 @@
         {
             if (e.AddedItems.Count > 0 && e.AddedItems[0] is RadioButton selectedItem)
             {
-                ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
-                var theme = (string) selectedItem.Tag;
-                var elementTheme = Enum.Parse<ElementTheme>(theme);
+                _localSettings.Values[THEME] = selectedItem.Tag;
+                ApplyTheme();
+            }
+        }
 
-                _localSettings.Values[THEME] = theme;
-                ((Frame) Window.Current.Content).RequestedTheme = elementTheme; // Apply theme to root frame
+        /// <summary>
+        /// Set application theme from local settings.
+        /// </summary>
+        internal static void ApplyTheme()
+        {
+            ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
+            var rootFrame = (Frame) Window.Current.Content;
 
-                switch (elementTheme)
-                {
-                    case ElementTheme.Default:
-                        titleBar.ButtonForegroundColor = Application.Current.RequestedTheme == ApplicationTheme.Light ? Colors.Black : Colors.White;
-                        break;
-                    case ElementTheme.Light:
-                        titleBar.ButtonForegroundColor = Colors.Black;
-                        break;
-                    case ElementTheme.Dark:
-                        titleBar.ButtonForegroundColor = Colors.White;
-                        break;
-                }
+            rootFrame.RequestedTheme = Enum.Parse<ElementTheme>((string) _localSettings.Values[THEME]);
+            // Update title bar buttons
+            switch (rootFrame.RequestedTheme)
+            {
+                case ElementTheme.Default:
+                    titleBar.ButtonForegroundColor = Application.Current.RequestedTheme == ApplicationTheme.Light ? Colors.Black : Colors.White;
+                    break;
+                case ElementTheme.Light:
+                    titleBar.ButtonForegroundColor = Colors.Black;
+                    break;
+                case ElementTheme.Dark:
+                    titleBar.ButtonForegroundColor = Colors.White;
+                    break;
             }
         }
     }
