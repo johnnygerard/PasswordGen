@@ -32,8 +32,8 @@
         private const char ZWSP = '\u200B'; // ZERO WIDTH SPACE
         private const string CHARSET_EMPTY_MESSAGE = "CHARACTER SET EMPTY";
 
-        private readonly ReadOnlyCollection<ToggleButton> _toggleButtons;
-        private readonly ReadOnlyDictionary<string, NumberBox> _charsetMins;
+        private readonly IReadOnlyList<ToggleButton> _toggleButtons;
+        private readonly IReadOnlyDictionary<string, NumberBox> _charsetMins;
         private readonly Dictionary<string, PasswordDataEntry> _passwordData;
         private readonly HashSet<char> _mainCharset;
         private string _password;
@@ -47,20 +47,20 @@
             };
 
             InitializeComponent();
-            _toggleButtons = new ReadOnlyCollection<ToggleButton>(new ToggleButton[]
+            _toggleButtons = new ToggleButton[]
             {
                 DigitSwitch,
                 SymbolSwitch,
                 LowercaseSwitch,
                 UppercaseSwitch,
-            });
-            _charsetMins = new ReadOnlyDictionary<string, NumberBox>(new Dictionary<string, NumberBox>
+            };
+            _charsetMins = new Dictionary<string, NumberBox>
             {
                 { DIGITS, DigitMin },
                 { SYMBOLS, SymbolMin },
                 { LOWERCASE, LowercaseMin },
                 { UPPERCASE, UppercaseMin },
-            });
+            };
             _passwordData = GetInitialPasswordData(out _mainCharset);
 
             // Set NumberBox integer format.

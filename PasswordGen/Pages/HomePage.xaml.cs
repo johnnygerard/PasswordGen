@@ -25,7 +25,7 @@
         private const string DEBUG = nameof(DEBUG);
         private const string TEST = nameof(TEST);
 
-        private readonly ReadOnlyCollection<ToggleSwitch> _toggleSwitches;
+        private readonly IReadOnlyList<ToggleSwitch> _toggleSwitches;
         private readonly HashSet<ToggleSwitch> _toggleSwitchesOn;
         private readonly Dictionary<string, PasswordDataEntry> _passwordData;
         private readonly HashSet<char> _mainCharset;
@@ -33,13 +33,13 @@
         public HomePage()
         {
             InitializeComponent();
-            _toggleSwitches = new ReadOnlyCollection<ToggleSwitch>(new ToggleSwitch[]
+            _toggleSwitches = new ToggleSwitch[]
             {
                 DigitSwitch,
                 SymbolSwitch,
                 LowercaseSwitch,
                 UppercaseSwitch
-            });
+            };
             _toggleSwitchesOn = new HashSet<ToggleSwitch>(_toggleSwitches);
             _passwordData = GetInitialPasswordData(out _mainCharset);
         }

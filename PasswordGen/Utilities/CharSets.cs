@@ -22,7 +22,7 @@
         /// ASCII charset without C0, SPACE and DEL characters.
         /// </summary>
         internal static readonly string _ascii;
-        internal static readonly ReadOnlyDictionary<string, string> _fullCharsets;
+        internal static readonly IReadOnlyDictionary<string, string> _fullCharsets;
         internal static readonly string[] _charsetKeys = new string[]
         {
             DIGITS,
@@ -43,13 +43,13 @@
                 .Except(lowercase)
                 .Except(uppercase);
 
-            _fullCharsets = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
+            _fullCharsets = new Dictionary<string, string>
             {
                 { DIGITS, digits},
                 { SYMBOLS, string.Join(null, symbols) },
                 { LOWERCASE, lowercase},
                 { UPPERCASE, uppercase},
-            });
+            };
         }
 
         /// <summary>
