@@ -47,19 +47,28 @@
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            // Initialize theme setting control
-            var theme = (string) _localSettings.Values[THEME];
+            InitThemeSetting((string) _localSettings.Values[THEME]);
+            ThemeSetting.SelectionChanged += Theme_SelectionChanged;
+
+            InitStartPageSetting((string) _localSettings.Values[START_PAGE]);
+            StartSetting.SelectionChanged += StartSetting_SelectionChanged;
+
+            Loaded -= Page_Loaded; // Execute once
+        }
+
+        private void InitThemeSetting(string theme)
+        {
             foreach (RadioButton radioButton in ThemeSetting.Items)
                 if (theme == (string) radioButton.Tag)
                 {
                     ThemeSetting.SelectedItem = radioButton;
                     break;
                 }
-            ThemeSetting.SelectionChanged += Theme_SelectionChanged;
             Debug.Assert(ThemeSetting.SelectedItem is RadioButton);
+        }
 
-            // Initialize start page setting control
-            var startPage = (string) _localSettings.Values[START_PAGE];
+        private void InitStartPageSetting(string startPage)
+        {
             foreach (ComboBoxItem comboBoxItem in StartSetting.Items)
             {
                 if (startPage == (string) comboBoxItem.Tag)
@@ -68,10 +77,7 @@
                     break;
                 }
             }
-            StartSetting.SelectionChanged += StartSetting_SelectionChanged;
             Debug.Assert(StartSetting.SelectedItem is ComboBoxItem);
-
-            Loaded -= Page_Loaded; // Execute once
         }
 
         internal static void InitializeHomePageSettings()
@@ -95,8 +101,10 @@
             }
         }
 
-        private void ResetButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        private void ResetButton_Click(object sender, RoutedEventArgs e)
         {
+            InitThemeSetting(ElementTheme.Default.ToString());
+            InitStartPageSetting(_homeTypeName);
             InitializeHomePageSettings();
             InitializeAdvancedPageSettings();
         }
