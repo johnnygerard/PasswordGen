@@ -36,22 +36,24 @@
                 </Style>
             </muxc:NavigationView.Resources>
             <muxc:NavigationView.MenuItems>
-                <muxc:NavigationViewItem Content="Home" Tag="{x:Bind _homeTypeName}">
+                <muxc:NavigationViewItem Content="Home" Tag="{x:Bind _home}">
                     <muxc:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE80F;"/>
                     </muxc:NavigationViewItem.Icon>
                 </muxc:NavigationViewItem>
-                <muxc:NavigationViewItem Content="Advanced" Tag="{x:Bind _advancedTypeName}">
+                <muxc:NavigationViewItem Content="Advanced" Tag="{x:Bind _advanced}">
                     <muxc:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE9F5;"/>
                     </muxc:NavigationViewItem.Icon>
                 </muxc:NavigationViewItem>
-                <!--<muxc:NavigationViewItem Content="About" x:Name="AboutPage">
+            </muxc:NavigationView.MenuItems>
+            <muxc:NavigationView.FooterMenuItems>
+                <muxc:NavigationViewItem ToolTipService.ToolTip="About" Tag="{x:Bind _about}">
                     <muxc:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE946;"/>
                     </muxc:NavigationViewItem.Icon>
-                </muxc:NavigationViewItem>-->
-            </muxc:NavigationView.MenuItems>
+                </muxc:NavigationViewItem>
+            </muxc:NavigationView.FooterMenuItems>
             <Frame x:Name="MainFrame" Background="{ThemeResource AcrylicBackground}"/>
         </muxc:NavigationView>
     </Grid>

@@ -15,8 +15,9 @@
 
     public sealed partial class MainPage : Page
     {
-        private readonly string _homeTypeName = typeof(HomePage).FullName;
-        private readonly string _advancedTypeName = typeof(AdvancedPage).FullName;
+        private readonly string _home = typeof(HomePage).FullName;
+        private readonly string _advanced = typeof(AdvancedPage).FullName;
+        private readonly string _about = typeof(AboutPage).FullName;
 
         // Window's title
         private readonly string _displayName = Package.Current.DisplayName;
