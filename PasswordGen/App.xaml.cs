@@ -32,18 +32,11 @@
             PackageVersion version = Package.Current.Id.Version;
             string versionNumber = $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
 
-            #region Remove all settings
-#if false
-            localSettings.Values.Clear();
-            foreach (string containerKey in localSettings.Containers.Keys)
-                localSettings.DeleteContainer(containerKey);
-#endif 
-            #endregion
-
             if (!localSettings.Values.ContainsKey(VERSION) || (string) localSettings.Values[VERSION] != versionNumber)
             {
                 localSettings.Values.Add(VERSION, versionNumber);
                 localSettings.Values.Add(THEME, ElementTheme.Default.ToString());
+                localSettings.Values.Add(START_PAGE, typeof(Pages.HomePage).FullName);
                 InitializeHomePageSettings();
                 InitializeAdvancedPageSettings();
             }

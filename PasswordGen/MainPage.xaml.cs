@@ -3,9 +3,11 @@
     using PasswordGen.Pages;
 
     using System;
+    using System.Diagnostics;
 
     using Windows.ApplicationModel;
     using Windows.ApplicationModel.Core;
+    using Windows.Storage;
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Controls;
 
@@ -13,16 +15,15 @@
 
     public sealed partial class MainPage : Page
     {
+        private readonly string _homeTypeName = typeof(HomePage).FullName;
+        private readonly string _advancedTypeName = typeof(AdvancedPage).FullName;
+
         // Window's title
         private readonly string _displayName = Package.Current.DisplayName;
-
-        private readonly MUXC::NavigationViewItem _startPage;
 
         public MainPage()
         {
             InitializeComponent();
-            _startPage = HomePage;
-
             SettingsPage.ApplyTheme();
 
             // Hide default title bar.
@@ -60,16 +61,25 @@
             => AppTitleBar.Visibility = sender.IsVisible ? Visibility.Visible : Visibility.Collapsed;
 
         private void NavigationView_Loaded(object sender, RoutedEventArgs e)
-            => ((MUXC::NavigationView) sender).SelectedItem = _startPage;
-
-        private void NavigationView_SelectionChanged(MUXC::NavigationView sender, MUXC::NavigationViewSelectionChangedEventArgs args)
         {
-            var selectedItem = (MUXC::NavigationViewItem) args.SelectedItem;
-            Type sourcePageType = args.IsSettingsSelected
-                ? typeof(Pages.SettingsPage)
-                : Type.GetType($"PasswordGen.Pages.{selectedItem.Name}");
+            var navigationView = (MUXC.NavigationView) sender;
+            var startPage = (string) ApplicationData.Current.LocalSettings.Values[SettingsPage.START_PAGE];
 
-            MainFrame.Navigate(sourcePageType, null, args.RecommendedNavigationTransitionInfo);
+            foreach (MUXC.NavigationViewItem navigationViewItem in navigationView.MenuItems)
+                if (startPage == (string) navigationViewItem.Tag)
+                {
+                    navigationView.SelectedItem = navigationViewItem;
+                    break;
+                }
+            Debug.Assert(navigationView.SelectedItem is MUXC.NavigationViewItem);
+        }
+
+        private void NavigationView_SelectionChanged(MUXC.NavigationView sender, MUXC.NavigationViewSelectionChangedEventArgs args)
+        {
+            var selectedItem = (MUXC.NavigationViewItem) args.SelectedItem;
+            Type pageType = args.IsSettingsSelected ? typeof(SettingsPage) : Type.GetType((string) selectedItem.Tag);
+
+            MainFrame.Navigate(pageType, null, args.RecommendedNavigationTransitionInfo);
         }
     }
 }

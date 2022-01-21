@@ -3,6 +3,7 @@
 
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
 
     using Windows.Storage;
     using Windows.UI;
@@ -14,6 +15,9 @@
 
     public sealed partial class SettingsPage : Page
     {
+        private readonly string _homeTypeName = typeof(HomePage).FullName;
+        private readonly string _advancedTypeName = typeof(AdvancedPage).FullName;
+
         // Default values
         internal const int DEFAULT_LENGTH = 16;
         internal const double DEFAULT_CHARSET_MINIMUM = 1;
@@ -28,24 +32,46 @@
         internal const string EXCLUDED_CHARSET = nameof(EXCLUDED_CHARSET);
         internal const string THEME = nameof(THEME);
         internal const string VERSION = nameof(VERSION);
+        internal const string START_PAGE = nameof(START_PAGE);
 
         private static readonly ApplicationDataContainer _localSettings = ApplicationData.Current.LocalSettings;
         internal static readonly IDictionary<string, object> _homePageSettings;
         internal static readonly IDictionary<string, object> _advancedPageSettings;
-        private readonly Dictionary<string, RadioButton> _radioButtons = new Dictionary<string, RadioButton>();
 
         static SettingsPage()
         {
             _homePageSettings = _localSettings.CreateContainer(HOME_PAGE_SETTINGS, ApplicationDataCreateDisposition.Always).Values;
             _advancedPageSettings = _localSettings.CreateContainer(ADVANCED_PAGE_SETTINGS, ApplicationDataCreateDisposition.Always).Values;
         }
-        public SettingsPage()
+        public SettingsPage() => InitializeComponent();
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            InitializeComponent();
-            foreach (RadioButton radioButton in ThemeSettings.Items)
-                _radioButtons.Add((string) radioButton.Tag, radioButton);
-            ThemeSettings.SelectedItem = _radioButtons[(string) _localSettings.Values[THEME]];
-            ThemeSettings.SelectionChanged += Theme_SelectionChanged;
+            // Initialize theme setting control
+            var theme = (string) _localSettings.Values[THEME];
+            foreach (RadioButton radioButton in ThemeSetting.Items)
+                if (theme == (string) radioButton.Tag)
+                {
+                    ThemeSetting.SelectedItem = radioButton;
+                    break;
+                }
+            ThemeSetting.SelectionChanged += Theme_SelectionChanged;
+            Debug.Assert(ThemeSetting.SelectedItem is RadioButton);
+
+            // Initialize start page setting control
+            var startPage = (string) _localSettings.Values[START_PAGE];
+            foreach (ComboBoxItem comboBoxItem in StartSetting.Items)
+            {
+                if (startPage == (string) comboBoxItem.Tag)
+                {
+                    StartSetting.SelectedItem = comboBoxItem;
+                    break;
+                }
+            }
+            StartSetting.SelectionChanged += StartSetting_SelectionChanged;
+            Debug.Assert(StartSetting.SelectedItem is ComboBoxItem);
+
+            Loaded -= Page_Loaded; // Execute once
         }
 
         internal static void InitializeHomePageSettings()
@@ -120,5 +146,8 @@
             // Get an opaque gray color.
             Color GetColor(byte value) => new Color { A = byte.MaxValue, R = value, G = value, B = value };
         }
+
+        private void StartSetting_SelectionChanged(object sender, SelectionChangedEventArgs e)
+            => _localSettings.Values[START_PAGE] = ((ComboBoxItem) e.AddedItems[0]).Tag;
     }
 }

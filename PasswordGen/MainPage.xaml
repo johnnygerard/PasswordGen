@@ -36,21 +36,21 @@
                 </Style>
             </muxc:NavigationView.Resources>
             <muxc:NavigationView.MenuItems>
-                <muxc:NavigationViewItem Content="Home" x:Name="HomePage">
+                <muxc:NavigationViewItem Content="Home" Tag="{x:Bind _homeTypeName}">
                     <muxc:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE80F;"/>
                     </muxc:NavigationViewItem.Icon>
                 </muxc:NavigationViewItem>
-                <muxc:NavigationViewItem Content="Advanced" x:Name="AdvancedPage">
+                <muxc:NavigationViewItem Content="Advanced" Tag="{x:Bind _advancedTypeName}">
                     <muxc:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE9F5;"/>
                     </muxc:NavigationViewItem.Icon>
                 </muxc:NavigationViewItem>
-                <muxc:NavigationViewItem Content="About" x:Name="AboutPage">
+                <!--<muxc:NavigationViewItem Content="About" x:Name="AboutPage">
                     <muxc:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE946;"/>
                     </muxc:NavigationViewItem.Icon>
-                </muxc:NavigationViewItem>
+                </muxc:NavigationViewItem>-->
             </muxc:NavigationView.MenuItems>
             <Frame x:Name="MainFrame" Background="{ThemeResource AcrylicBackground}"/>
         </muxc:NavigationView>
