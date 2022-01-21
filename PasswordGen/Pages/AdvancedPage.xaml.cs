@@ -70,9 +70,6 @@
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            // Page_Loaded removes itself to execute on first load only.
-            ((Page) Frame.Content).Loaded -= Page_Loaded;
-
             // Attach event handlers
             foreach (var toggleButton in _toggleButtons)
             {
@@ -88,6 +85,8 @@
             ApplyUserSettings();
             RefreshPassword();
             SimulateUserInput();
+
+            Loaded -= Page_Loaded; // Execute once
         }
 
         [Conditional(TEST)]
