@@ -9,24 +9,26 @@
     mc:Ignorable="d"
     Loaded="Page_Loaded"
     NavigationCacheMode="Required">
-    <Grid Padding="16">
-        <StackPanel Spacing="16">
-            <muxc:RadioButtons x:Name="ThemeSetting">
-                <muxc:RadioButtons.Header>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" Glyph="&#xE790;"/>
-                        <TextBlock Text="Theme" FontWeight="SemiBold" FontSize="15"/>
-                    </StackPanel>
-                </muxc:RadioButtons.Header>
-                <RadioButton Tag="Default" Content="System"/>
-                <RadioButton Tag="Light" Content="Light"/>
-                <RadioButton Tag="Dark" Content="Dark"/>
-            </muxc:RadioButtons>
-            <ComboBox x:Name="StartSetting" Header="Start page">
-                <ComboBoxItem Tag="{x:Bind _homeTypeName}" Content="Home"/>
-                <ComboBoxItem Tag="{x:Bind _advancedTypeName}" Content="Advanced"/>
-            </ComboBox>
-            <Button Click="ResetButton_Click">Reset all settings</Button>
-        </StackPanel>
-    </Grid>
+    <ScrollViewer>
+        <Grid Padding="16">
+            <StackPanel>
+                <muxc:RadioButtons x:Name="ThemeSetting">
+                    <muxc:RadioButtons.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" Glyph="&#xE790;"/>
+                            <TextBlock Text="Theme" FontWeight="SemiBold" FontSize="15"/>
+                        </StackPanel>
+                    </muxc:RadioButtons.Header>
+                    <RadioButton Tag="Default" Content="System"/>
+                    <RadioButton Tag="Light" Content="Light"/>
+                    <RadioButton Tag="Dark" Content="Dark"/>
+                </muxc:RadioButtons>
+                <ComboBox x:Name="StartSetting" Header="Start page" Margin="0,16,0,24">
+                    <ComboBoxItem Tag="{x:Bind _homeTypeName}" Content="Home"/>
+                    <ComboBoxItem Tag="{x:Bind _advancedTypeName}" Content="Advanced"/>
+                </ComboBox>
+                <Button Click="ResetButton_Click">Reset all settings</Button>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
 </Page>
