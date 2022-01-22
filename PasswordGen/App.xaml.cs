@@ -1,6 +1,7 @@
 ﻿namespace PasswordGen
 {
     using System;
+    using System.Collections.Generic;
 
     using Windows.ApplicationModel;
     using Windows.ApplicationModel.Activation;
@@ -22,24 +23,22 @@
         /// </summary>
         public App()
         {
-            InitializeComponent();
-            Suspending += OnSuspending;
-        }
-
-        private void InitSettings()
-        {
-            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+            // Initialize settings
+            IDictionary<string, object> localRootSettings = ApplicationData.Current.LocalSettings.Values;
             PackageVersion version = Package.Current.Id.Version;
-            string versionNumber = $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+            string versionNumber = string.Join('.', version.Major, version.Minor, version.Build, version.Revision);
 
-            if (!localSettings.Values.ContainsKey(VERSION) || (string) localSettings.Values[VERSION] != versionNumber)
+            if (!localRootSettings.ContainsKey(VERSION) || (string) localRootSettings[VERSION] != versionNumber)
             {
-                localSettings.Values.Add(VERSION, versionNumber);
-                localSettings.Values.Add(THEME, ElementTheme.Default.ToString());
-                localSettings.Values.Add(START_PAGE, typeof(Pages.HomePage).FullName);
+                localRootSettings[VERSION] = versionNumber;
+                localRootSettings[THEME] = ElementTheme.Default.ToString();
+                localRootSettings[START_PAGE] = typeof(Pages.HomePage).FullName;
                 InitializeHomePageSettings();
                 InitializeAdvancedPageSettings();
             }
+
+            InitializeComponent();
+            Suspending += OnSuspending;
         }
 
         /// <summary>
@@ -67,8 +66,6 @@
 
                 // Place the frame in the current Window
                 Window.Current.Content = rootFrame;
-
-                InitSettings();
             }
 
             if (!e.PrelaunchActivated)

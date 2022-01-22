@@ -32,6 +32,7 @@
         private const char ZWSP = '\u200B'; // ZERO WIDTH SPACE
         private const string CHARSET_EMPTY_MESSAGE = "CHARACTER SET EMPTY";
 
+        private readonly IDictionary<string, object> _advancedPageSettings;
         private readonly IReadOnlyList<ToggleButton> _toggleButtons;
         private readonly IReadOnlyDictionary<string, NumberBox> _charsetMins;
         private readonly Dictionary<string, PasswordDataEntry> _passwordData;
@@ -40,6 +41,7 @@
 
         public AdvancedPage()
         {
+            _advancedPageSettings = ApplicationData.Current.LocalSettings.Containers[ADVANCED_PAGE_SETTINGS].Values;
             var numberFormatter = new DecimalFormatter
             {
                 NumberRounder = new IncrementNumberRounder { RoundingAlgorithm = RoundingAlgorithm.RoundTowardsZero },

@@ -35,22 +35,16 @@
         internal const string START_PAGE = nameof(START_PAGE);
 
         private static readonly ApplicationDataContainer _localSettings = ApplicationData.Current.LocalSettings;
-        internal static readonly IDictionary<string, object> _homePageSettings;
-        internal static readonly IDictionary<string, object> _advancedPageSettings;
+        private static readonly IDictionary<string, object> _localRootSettings = _localSettings.Values;
 
-        static SettingsPage()
-        {
-            _homePageSettings = _localSettings.CreateContainer(HOME_PAGE_SETTINGS, ApplicationDataCreateDisposition.Always).Values;
-            _advancedPageSettings = _localSettings.CreateContainer(ADVANCED_PAGE_SETTINGS, ApplicationDataCreateDisposition.Always).Values;
-        }
         public SettingsPage() => InitializeComponent();
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            InitThemeSetting((string) _localSettings.Values[THEME]);
+            InitThemeSetting((string) _localRootSettings[THEME]);
             ThemeSetting.SelectionChanged += Theme_SelectionChanged;
 
-            InitStartPageSetting((string) _localSettings.Values[START_PAGE]);
+            InitStartPageSetting((string) _localRootSettings[START_PAGE]);
             StartSetting.SelectionChanged += StartSetting_SelectionChanged;
 
             Loaded -= Page_Loaded; // Execute once
@@ -82,12 +76,16 @@
 
         internal static void InitializeHomePageSettings()
         {
+            IDictionary<string, object> _homePageSettings = _localSettings.CreateContainer(HOME_PAGE_SETTINGS, ApplicationDataCreateDisposition.Always).Values;
+
             _homePageSettings[LENGTH] = DEFAULT_LENGTH;
             foreach (string charsetKey in _charsetKeys)
                 _homePageSettings[charsetKey] = true;
         }
         internal static void InitializeAdvancedPageSettings()
         {
+            IDictionary<string, object> _advancedPageSettings = _localSettings.CreateContainer(ADVANCED_PAGE_SETTINGS, ApplicationDataCreateDisposition.Always).Values;
+
             _advancedPageSettings[LENGTH] = DEFAULT_LENGTH;
             _advancedPageSettings[INCLUDED_CHARSET] = string.Empty;
             _advancedPageSettings[EXCLUDED_CHARSET] = string.Empty;
@@ -113,7 +111,7 @@
         {
             if (e.AddedItems.Count > 0 && e.AddedItems[0] is RadioButton selectedItem)
             {
-                _localSettings.Values[THEME] = selectedItem.Tag;
+                _localRootSettings[THEME] = selectedItem.Tag;
                 ApplyTheme();
             }
         }
@@ -126,7 +124,7 @@
             ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
             var rootFrame = (Frame) Window.Current.Content;
 
-            rootFrame.RequestedTheme = Enum.Parse<ElementTheme>((string) _localSettings.Values[THEME]);
+            rootFrame.RequestedTheme = Enum.Parse<ElementTheme>((string) _localRootSettings[THEME]);
             bool isDarkTheme = rootFrame.RequestedTheme == ElementTheme.Dark ||
                 (rootFrame.RequestedTheme == ElementTheme.Default && Application.Current.RequestedTheme == ApplicationTheme.Dark);
             // Update title bar buttons
@@ -156,6 +154,6 @@
         }
 
         private void StartSetting_SelectionChanged(object sender, SelectionChangedEventArgs e)
-            => _localSettings.Values[START_PAGE] = ((ComboBoxItem) e.AddedItems[0]).Tag;
+            => _localRootSettings[START_PAGE] = ((ComboBoxItem) e.AddedItems[0]).Tag;
     }
 }

@@ -8,10 +8,10 @@
     {
         public AboutPage()
         {
-            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-            
+            var versionNumber = (string) ApplicationData.Current.LocalSettings.Values[SettingsPage.VERSION];
+
             InitializeComponent();
-            AppName.Content = $"{Package.Current.DisplayName} {localSettings.Values[SettingsPage.VERSION]}";
+            AppName.Content = $"{Package.Current.DisplayName} {versionNumber}";
         }
     }
 }

@@ -19,28 +19,26 @@
                     x:Name="AppName"
                     Content="AppName"/>
                 <TextBlock TextAlignment="Center">
-            <Hyperlink
-                NavigateUri="https://github.com/johnnygerard/PasswordGen/issues"
-                ToolTipService.ToolTip="https://github.com/johnnygerard/PasswordGen/issues">Create an issue</Hyperlink>
-            <Run Text="on GitHub to report a bug or request a feature."/>
+                    <Hyperlink
+                        NavigateUri="https://github.com/johnnygerard/PasswordGen/issues"
+                        ToolTipService.ToolTip="https://github.com/johnnygerard/PasswordGen/issues">Create an issue</Hyperlink>
+                    <Run Text="on GitHub to report a bug or request a feature."/>
                 </TextBlock>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
                     <HyperlinkButton
                         BorderBrush="{ThemeResource DefaultTextForegroundThemeBrush}"
                         x:Name="Contact"
-                        HorizontalAlignment="Center"
                         NavigateUri="mailto:contact@johnnygerard.dev"
                         ToolTipService.ToolTip="contact@johnnygerard.dev">
                         <HyperlinkButton.Content>
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <TextBlock Text="Contact Developer"/>
-                                <FontIcon FontSize="14" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" Glyph="&#xE715;"/>
+                                <FontIcon FontSize="{x:Bind Contact.FontSize}" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" Glyph="&#xE715;"/>
                             </StackPanel>
                         </HyperlinkButton.Content>
                     </HyperlinkButton>
                     <HyperlinkButton
                         BorderBrush="{ThemeResource DefaultTextForegroundThemeBrush}"
-                        HorizontalAlignment="Center"
                         Content="View app in Microsoft Store"
                         NavigateUri="ms-windows-store://pdp/?productid=9N41PKLFWJNJ"/>
                 </StackPanel>

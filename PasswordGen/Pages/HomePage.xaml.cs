@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
@@ -10,6 +9,7 @@
     using Utilities;
 
     using Windows.ApplicationModel.DataTransfer;
+    using Windows.Storage;
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Controls.Primitives;
@@ -25,6 +25,7 @@
         private const string DEBUG = nameof(DEBUG);
         private const string TEST = nameof(TEST);
 
+        private readonly IDictionary<string, object> _homePageSettings;
         private readonly IReadOnlyList<ToggleSwitch> _toggleSwitches;
         private readonly HashSet<ToggleSwitch> _toggleSwitchesOn;
         private readonly Dictionary<string, PasswordDataEntry> _passwordData;
@@ -33,6 +34,7 @@
         public HomePage()
         {
             InitializeComponent();
+            _homePageSettings = ApplicationData.Current.LocalSettings.Containers[HOME_PAGE_SETTINGS].Values;
             _toggleSwitches = new ToggleSwitch[]
             {
                 DigitSwitch,
