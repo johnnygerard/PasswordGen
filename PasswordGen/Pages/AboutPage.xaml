@@ -9,8 +9,8 @@
     mc:Ignorable="d"
     NavigationCacheMode="Required">
     <ScrollViewer>
-        <Grid Padding="16" VerticalAlignment="Center">
-            <StackPanel Spacing="12">
+        <Grid Padding="16">
+            <StackPanel Spacing="12" VerticalAlignment="Center" HorizontalAlignment="Center">
                 <HyperlinkButton
                     BorderBrush="{ThemeResource DefaultTextForegroundThemeBrush}"
                     HorizontalAlignment="Center"
@@ -18,7 +18,7 @@
                     ToolTipService.ToolTip="https://github.com/johnnygerard/PasswordGen"
                     x:Name="AppName"
                     Content="AppName"/>
-                <TextBlock TextAlignment="Center">
+                <TextBlock HorizontalAlignment="Center">
                     <Hyperlink
                         NavigateUri="https://github.com/johnnygerard/PasswordGen/issues"
                         ToolTipService.ToolTip="https://github.com/johnnygerard/PasswordGen/issues">Create an issue</Hyperlink>
@@ -43,7 +43,7 @@
                         NavigateUri="ms-windows-store://pdp/?productid=9N41PKLFWJNJ"/>
                 </StackPanel>
                 <Rectangle Width="460" Height="1" Fill="{ThemeResource DefaultTextForegroundThemeBrush}"/>
-                <TextBlock TextAlignment="Center">
+                <TextBlock HorizontalAlignment="Center" HorizontalTextAlignment="Center">
                     <Run Text="Credits" FontWeight="Bold"/>
                     <LineBreak/>
                     <Run Text="Software made with"/>
@@ -59,7 +59,7 @@
                         ToolTipService.ToolTip="https://www.flaticon.com"
                         NavigateUri="https://www.flaticon.com">www.flaticon.com</Hyperlink>
                 </TextBlock>
-                <TextBlock TextAlignment="Center">
+                <TextBlock HorizontalAlignment="Center" HorizontalTextAlignment="Center">
                     <Run Text="Copyright" FontWeight="Bold"/>
                     <LineBreak/>
                     <Run Text="&#xA9; 2021-2022 Johnny A. F. Gérard"/>
