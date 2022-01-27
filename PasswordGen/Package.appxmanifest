@@ -9,7 +9,7 @@
   <Identity
     Name="50409JohnnyGrard.PasswordGen"
     Publisher="CN=62E4F0B5-A07F-4271-927C-3F8BEED427D0"
-    Version="2.0.0.0" />
+    Version="2.0.1.0" />
 
   <mp:PhoneIdentity PhoneProductId="e44ef05c-d9b6-4896-bdab-567aa6a2ee50" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
