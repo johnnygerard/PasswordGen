@@ -73,7 +73,7 @@
                     FontSize="{x:Bind CopyButton.FontSize}"/>
                 <StackPanel Orientation="Horizontal" Margin="0,32,0,40" HorizontalAlignment="Center">
                     <Button Click="CopyButton_Click" CornerRadius="4,0,0,4" x:Name="CopyButton">Copy</Button>
-                    <Button Click="RefreshButton_Click" CornerRadius="0,4,4,0" Height="32" ToolTipService.ToolTip="Refresh password">
+                    <Button Click="RefreshButton_Click" CornerRadius="0,4,4,0" Height="32" AutomationProperties.AutomationId="RefreshButton" ToolTipService.ToolTip="Refresh password">
                         <FontIcon FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" FontSize="{x:Bind CopyButton.FontSize}" Glyph="&#xE72C;"/>
                     </Button>
                 </StackPanel>
@@ -105,8 +105,8 @@
                 <ToggleSwitch Grid.Row="0" Grid.Column="1" Tag="{x:Bind util:Charsets.LOWERCASE}" x:Name="LowercaseSwitch" Header="{StaticResource LOWERCASE_NAME}" Width="76"/>
                 <ToggleSwitch Grid.Row="1" Grid.Column="1" Tag="{x:Bind util:Charsets.UPPERCASE}" x:Name="UppercaseSwitch" Header="{StaticResource UPPERCASE_NAME}" Width="76"/>
                 <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,32,0,0">
-                    <Button Click="ResetButton_Click" CornerRadius="4,0,0,4">Reset</Button>
-                    <Button Click="SaveSettings_Click" CornerRadius="0,4,4,0"  Height="32" ToolTipService.ToolTip="Set current settings as default">
+                    <Button AutomationProperties.AutomationId="ResetButton" Click="ResetButton_Click" CornerRadius="4,0,0,4">Reset</Button>
+                    <Button AutomationProperties.AutomationId="SaveButton" Click="SaveSettings_Click" CornerRadius="0,4,4,0"  Height="32" ToolTipService.ToolTip="Set current settings as default">
                         <FontIcon FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" FontSize="{x:Bind CopyButton.FontSize}" Glyph="&#xE105;"/>
                     </Button>
                 </StackPanel>

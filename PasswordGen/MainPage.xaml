@@ -36,7 +36,7 @@
                 </Style>
             </muxc:NavigationView.Resources>
             <muxc:NavigationView.MenuItems>
-                <muxc:NavigationViewItem Content="Home" Tag="{x:Bind _home}">
+                <muxc:NavigationViewItem Content="Home" Tag="{x:Bind _home}" AutomationProperties.AutomationId="HomePage">
                     <muxc:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE80F;"/>
                     </muxc:NavigationViewItem.Icon>
