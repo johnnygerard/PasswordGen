@@ -1,8 +1,6 @@
 ﻿namespace PasswordGen.Pages
 {
-    using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -22,12 +20,10 @@
     {
         // Throttle delay of 4 ms to match a monitor refresh rate of 240 Hz.
         private const int THROTTLE_DELAY = 4;
-        private const string DEBUG = nameof(DEBUG);
-        private const string TEST = nameof(TEST);
 
         private readonly IDictionary<string, object> _homePageSettings;
-        private readonly IReadOnlyList<ToggleSwitch> _toggleSwitches;
-        private readonly HashSet<ToggleSwitch> _toggleSwitchesOn;
+        private readonly IReadOnlyList<ToggleSwitch> _charsetSwitches;
+        private readonly HashSet<ToggleSwitch> _charsetSwitchesOn;
         private readonly Dictionary<string, PasswordDataEntry> _passwordData;
         private readonly HashSet<char> _mainCharset;
 
@@ -35,103 +31,62 @@
         {
             InitializeComponent();
             _homePageSettings = ApplicationData.Current.LocalSettings.Containers[HOME_PAGE_SETTINGS].Values;
-            _toggleSwitches = new ToggleSwitch[]
+            _charsetSwitches = new ToggleSwitch[]
             {
                 DigitSwitch,
                 SymbolSwitch,
                 LowercaseSwitch,
                 UppercaseSwitch
             };
-            _toggleSwitchesOn = new HashSet<ToggleSwitch>(_toggleSwitches);
+            _charsetSwitchesOn = new HashSet<ToggleSwitch>(_charsetSwitches);
             _passwordData = GetInitialPasswordData(out _mainCharset);
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             // Attach event handlers
-            foreach (var toggleSwitch in _toggleSwitches)
-                toggleSwitch.Toggled += ToggleSwitch_Toggled;
+            foreach (ToggleSwitch charsetSwitch in _charsetSwitches)
+                charsetSwitch.Toggled += CharsetSwitch_Toggled;
             PasswordLengthSlider.ValueChanged += PasswordLengthSlider_ValueChanged;
 
             ApplyUserSettings();
             RefreshPassword();
-            SimulateUserInput();
 
             Loaded -= Page_Loaded; // Execute once
         }
 
-        [Conditional(TEST)]
-        private async void SimulateUserInput()
+        private ToggleSwitch _disabledCharsetSwitch;
+        private void CharsetSwitch_Toggled(object sender, RoutedEventArgs e)
         {
-            var rng = new Random();
-            var stopwatch = Stopwatch.StartNew();
-            int userActionsCount = 0;
-
-            while (stopwatch.ElapsedMilliseconds < 5000)
-            {
-                switch (rng.Next(6))
-                {
-                    case 0:
-                        PasswordLengthSlider.Value = rng.Next((int) PasswordLengthSlider.Minimum, (int) PasswordLengthSlider.Maximum + 1);
-                        break;
-                    case 1:
-                        var toggleSwitch = _toggleSwitches[rng.Next(_toggleSwitches.Count)];
-
-                        if (toggleSwitch.IsEnabled)
-                            toggleSwitch.IsOn = !toggleSwitch.IsOn;
-                        break;
-                    case 2:
-                        CopyButton_Click(null, null);
-                        break;
-                    case 3:
-                        RefreshButton_Click(null, null);
-                        break;
-                    case 4:
-                        ResetButton_Click(null, null);
-                        break;
-                    case 5:
-                        SaveSettings_Click(null, null);
-                        break;
-                }
-                userActionsCount++;
-                await Task.Delay(1);
-            }
-            stopwatch.Stop();
-            Debug.WriteLine($"userActionsCount: {userActionsCount}");
-        }
-
-        private ToggleSwitch _disabledToggleSwitch;
-        private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
-        {
-            var toggleSwitch = (ToggleSwitch) sender;
-            string charsetKey = (string) toggleSwitch.Tag;
+            var charsetSwitch = (ToggleSwitch) sender;
+            string charsetKey = (string) charsetSwitch.Tag;
             string charset = _fullCharsets[charsetKey];
 
-            if (toggleSwitch.IsOn)
+            if (charsetSwitch.IsOn)
             {
-                // Re-enable a disabled ToggleSwitch
-                if (_toggleSwitchesOn.Count == 1)
-                    _disabledToggleSwitch.IsEnabled = true;
+                // Re-enable a disabled charset switch
+                if (_charsetSwitchesOn.Count == 1)
+                    _disabledCharsetSwitch.IsEnabled = true;
 
-                _toggleSwitchesOn.Add(toggleSwitch);
+                _charsetSwitchesOn.Add(charsetSwitch);
 
-                // Update _passwordData
+                // Update password data
                 _mainCharset.UnionWith(charset);
                 _passwordData[MAIN_CHARSET].Length--;
                 _passwordData[charsetKey].Charset = charset;
             }
             else
             {
-                _toggleSwitchesOn.Remove(toggleSwitch);
+                _charsetSwitchesOn.Remove(charsetSwitch);
 
-                // Disable last ToggleSwitch on to avoid empty charset
-                if (_toggleSwitchesOn.Count == 1)
+                // Disable last charset switch on to avoid empty charset
+                if (_charsetSwitchesOn.Count == 1)
                 {
-                    _disabledToggleSwitch = _toggleSwitchesOn.First();
-                    _disabledToggleSwitch.IsEnabled = false;
+                    _disabledCharsetSwitch = _charsetSwitchesOn.First();
+                    _disabledCharsetSwitch.IsEnabled = false;
                 }
 
-                // Update _passwordData
+                // Update password data
                 _mainCharset.ExceptWith(charset);
                 _passwordData[MAIN_CHARSET].Length++;
                 _passwordData[charsetKey].Charset = string.Empty;
@@ -151,37 +106,7 @@
                 _open = false;
                 await Task.Delay(THROTTLE_DELAY);
                 PasswordTextBlock.Text = BuildPassword(_passwordData.Values, (int) PasswordLengthSlider.Value);
-                TestProgram();
                 _open = true;
-            }
-        }
-
-        [Conditional(DEBUG)]
-        private void TestProgram()
-        {
-            int toggleSwitchesOnCount = _toggleSwitches.Where(toggleSwitch => toggleSwitch.IsOn).Count();
-
-            // At least one charset is on
-            Debug.Assert(toggleSwitchesOnCount > 0);
-
-            // Test ToggleSwitch.IsEnabled
-            if (toggleSwitchesOnCount == 1)
-                foreach (var toggleSwitch in _toggleSwitches)
-                    Debug.Assert(toggleSwitch.IsOn == !toggleSwitch.IsEnabled);
-            else
-                foreach (var toggleSwitch in _toggleSwitches)
-                    Debug.Assert(toggleSwitch.IsEnabled);
-
-            // Test length
-            Debug.Assert(PasswordTextBlock.Text.Length == (int) PasswordLengthSlider.Value);
-
-            // Test length per charset (at least one when on, zero when off)
-            foreach (var toggleSwitch in _toggleSwitches)
-            {
-                string charsetKey = (string) toggleSwitch.Tag;
-                string charset = _fullCharsets[charsetKey];
-
-                Debug.Assert(PasswordTextBlock.Text.Intersect(charset).Any() == toggleSwitch.IsOn);
             }
         }
 
@@ -202,8 +127,8 @@
 
         private void SaveSettings_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var toggleSwitch in _toggleSwitches)
-                _homePageSettings[(string) toggleSwitch.Tag] = toggleSwitch.IsOn;
+            foreach (ToggleSwitch charsetSwitch in _charsetSwitches)
+                _homePageSettings[(string) charsetSwitch.Tag] = charsetSwitch.IsOn;
             _homePageSettings[LENGTH] = (int) PasswordLengthSlider.Value;
         }
 
@@ -211,16 +136,16 @@
 
         private void ApplyUserSettings()
         {
-            // Turn a ToggleSwitch on first to avoid validation conflicts
-            foreach (var toggleSwitch in _toggleSwitches)
-                if ((bool) _homePageSettings[(string) toggleSwitch.Tag])
+            // Turn a charset switch on first to avoid validation conflicts
+            foreach (ToggleSwitch charsetSwitch in _charsetSwitches)
+                if ((bool) _homePageSettings[(string) charsetSwitch.Tag])
                 {
-                    toggleSwitch.IsOn = true;
+                    charsetSwitch.IsOn = true;
                     break;
                 }
 
-            foreach (var toggleSwitch in _toggleSwitches)
-                toggleSwitch.IsOn = (bool) _homePageSettings[(string) toggleSwitch.Tag];
+            foreach (ToggleSwitch charsetSwitch in _charsetSwitches)
+                charsetSwitch.IsOn = (bool) _homePageSettings[(string) charsetSwitch.Tag];
 
             PasswordLengthSlider.Value = (int) _homePageSettings[LENGTH];
         }
