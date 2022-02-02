@@ -41,7 +41,7 @@
                         <FontIcon Glyph="&#xE80F;"/>
                     </muxc:NavigationViewItem.Icon>
                 </muxc:NavigationViewItem>
-                <muxc:NavigationViewItem Content="Advanced" Tag="{x:Bind _advanced}">
+                <muxc:NavigationViewItem Content="Advanced" Tag="{x:Bind _advanced}" AutomationProperties.AutomationId="AdvancedPage">
                     <muxc:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE9F5;"/>
                     </muxc:NavigationViewItem.Icon>

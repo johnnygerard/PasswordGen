@@ -141,8 +141,8 @@
                 <muxc:NumberBox Grid.Row="4" Tag="{x:Bind util:Charsets.UPPERCASE}" x:Name="UppercaseMin"/>
                 <StackPanel Grid.Row="5" Grid.ColumnSpan="3"
                     Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
-                    <Button Click="ResetButton_Click" CornerRadius="4,0,0,4">Reset</Button>
-                    <Button Click="SaveSettings_Click" CornerRadius="0,4,4,0"  Height="32" ToolTipService.ToolTip="Set current settings as default">
+                    <Button AutomationProperties.AutomationId="ResetButton" Click="ResetButton_Click" CornerRadius="4,0,0,4">Reset</Button>
+                    <Button AutomationProperties.AutomationId="SaveButton" Click="SaveSettings_Click" CornerRadius="0,4,4,0"  Height="32" ToolTipService.ToolTip="Set current settings as default">
                         <FontIcon FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets" FontSize="{x:Bind CopyButton.FontSize}" Glyph="&#xE105;"/>
                     </Button>
                 </StackPanel>
