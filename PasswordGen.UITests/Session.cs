@@ -30,7 +30,7 @@
             });
             options.AddAdditionalCapability("app", APP_ID);
             _client = new WindowsDriver<WindowsElement>(new Uri(WIN_APP_DRIVER_URL), options);
-            _client.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(5000);
+            _client.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(500);
         }
 
         [AssemblyCleanup]
