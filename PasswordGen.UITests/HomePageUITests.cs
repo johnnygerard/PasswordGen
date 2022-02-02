@@ -19,8 +19,8 @@ namespace PasswordGen.UITests
         private static WindowsElement _passwordTextBlock;
         private static WindowsElement _passwordLengthSlider;
         private static (WindowsElement, string)[] _charsets;
-        private static List<WindowsElement> _toggleSwitches;
-        private static int _toggleSwitchTestIterations = 16;
+        private static List<WindowsElement> _charsetSwitches;
+        private static int _charsetSwitchTestIterations = 16;
 
         [ClassInitialize]
         public static void InitClass(TestContext context)
@@ -43,7 +43,7 @@ namespace PasswordGen.UITests
                 (_client.FindElementByAccessibilityId("LowercaseSwitch"), _lowercase),
                 (_client.FindElementByAccessibilityId("UppercaseSwitch"), _uppercase),
             };
-            _toggleSwitches = new List<WindowsElement>(_charsets.Select(charset => charset.Item1));
+            _charsetSwitches = new List<WindowsElement>(_charsets.Select(charset => charset.Item1));
         }
 
         [TestMethod]
@@ -99,17 +99,17 @@ namespace PasswordGen.UITests
         }
 
         [TestMethod]
-        public void TestToggleSwitches()
+        public void TestCharsetSwitches()
         {
-            for (int i = 0; i < _toggleSwitchTestIterations; i++)
+            for (int i = 0; i < _charsetSwitchTestIterations; i++)
             {
                 // Arrange
-                WindowsElement randomToggleSwitch = _toggleSwitches[_rng.Next(_toggleSwitches.Count)];
+                WindowsElement randomCharsetSwitch = _charsetSwitches[_rng.Next(_charsetSwitches.Count)];
                 string oldPassword = _passwordTextBlock.Text;
 
                 // Act
-                if (randomToggleSwitch.Enabled)
-                    randomToggleSwitch.Click();
+                if (randomCharsetSwitch.Enabled)
+                    randomCharsetSwitch.Click();
                 else continue;
 
                 // Assert
@@ -124,50 +124,50 @@ namespace PasswordGen.UITests
             WindowsElement resetButton = _client.FindElementByAccessibilityId("ResetButton");
             WindowsElement saveButton = _client.FindElementByAccessibilityId("SaveButton");
             string oldPassword = _passwordTextBlock.Text;
-            _toggleSwitchTestIterations = 4;
+            _charsetSwitchTestIterations = 4;
 
             // Save password settings
             saveButton.Click();
             string savedLength = _passwordLengthSlider.Text;
-            bool[] savedToggleSwitchesOn = _toggleSwitches.Select(toggleSwitch => toggleSwitch.Selected).ToArray();
+            bool[] savedCharsetSwitchesOn = _charsetSwitches.Select(charsetSwitch => charsetSwitch.Selected).ToArray();
 
             // Make some random changes
             TestLengthSlider();
-            TestToggleSwitches();
+            TestCharsetSwitches();
             #endregion
 
             // Act
             resetButton.Click();
 
             #region Assert
-            bool[] toggleSwitchesOn = _toggleSwitches.Select(toggleSwitch => toggleSwitch.Selected).ToArray();
+            bool[] charsetSwitchesOn = _charsetSwitches.Select(charsetSwitch => charsetSwitch.Selected).ToArray();
 
             // Assert that settings are restored
-            for (int i = 0; i < toggleSwitchesOn.Length; i++)
-                Assert.AreEqual(savedToggleSwitchesOn[i], toggleSwitchesOn[i]);
+            for (int i = 0; i < charsetSwitchesOn.Length; i++)
+                Assert.AreEqual(savedCharsetSwitchesOn[i], charsetSwitchesOn[i]);
             Assert.AreEqual(savedLength, _passwordLengthSlider.Text);
 
             ValidatePassword(oldPassword);
             #endregion
 
-            _toggleSwitchTestIterations = 16;
+            _charsetSwitchTestIterations = 16;
         }
 
         private void ValidatePassword(string oldPassword)
         {
             string newPassword = _passwordTextBlock.Text;
             int charsetsOnCount = 0;
-            foreach (WindowsElement toggleSwitch in _toggleSwitches)
-                charsetsOnCount += toggleSwitch.Selected ? 1 : 0;
+            foreach (WindowsElement charsetSwitch in _charsetSwitches)
+                charsetsOnCount += charsetSwitch.Selected ? 1 : 0;
 
-            // Validate state of each ToggleSwitch
+            // Validate state of each charset switch
             Assert.IsTrue(charsetsOnCount > 0);
             if (charsetsOnCount == 1)
-                foreach (WindowsElement toggleSwitch in _toggleSwitches)
-                    Assert.AreNotEqual(toggleSwitch.Selected, toggleSwitch.Enabled);
+                foreach (WindowsElement charsetSwitch in _charsetSwitches)
+                    Assert.AreNotEqual(charsetSwitch.Selected, charsetSwitch.Enabled);
             else
-                foreach (WindowsElement toggleSwitch in _toggleSwitches)
-                    Assert.IsTrue(toggleSwitch.Enabled);
+                foreach (WindowsElement charsetSwitch in _charsetSwitches)
+                    Assert.IsTrue(charsetSwitch.Enabled);
 
             // Validate new password
             Assert.AreNotEqual(oldPassword, newPassword);
@@ -176,8 +176,8 @@ namespace PasswordGen.UITests
             Assert.AreEqual(int.Parse(_passwordLengthSlider.Text), newPassword.Length);
 
             // Validate password character composition
-            foreach ((WindowsElement toggleSwitch, string charset) in _charsets)
-                Assert.AreEqual(toggleSwitch.Selected, newPassword.Intersect(charset).Any());
+            foreach ((WindowsElement charsetSwitch, string charset) in _charsets)
+                Assert.AreEqual(charsetSwitch.Selected, newPassword.Intersect(charset).Any());
         }
     }
 }
