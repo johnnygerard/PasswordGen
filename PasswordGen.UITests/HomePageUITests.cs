@@ -155,7 +155,8 @@ namespace PasswordGen.UITests
 
         private void ValidatePassword(string oldPassword)
         {
-            string newPassword = _passwordTextBlock.Text;
+            Thread.Sleep(10); // Wait for the password to refresh
+            string password = _passwordTextBlock.Text;
             int charsetsOnCount = 0;
             foreach (WindowsElement charsetSwitch in _charsetSwitches)
                 charsetsOnCount += charsetSwitch.Selected ? 1 : 0;
@@ -169,15 +170,12 @@ namespace PasswordGen.UITests
                 foreach (WindowsElement charsetSwitch in _charsetSwitches)
                     Assert.IsTrue(charsetSwitch.Enabled);
 
-            // Validate new password
-            Assert.AreNotEqual(oldPassword, newPassword);
-
             // Validate password length
-            Assert.AreEqual(int.Parse(_passwordLengthSlider.Text), newPassword.Length);
+            Assert.AreEqual(int.Parse(_passwordLengthSlider.Text), password.Length);
 
             // Validate password character composition
             foreach ((WindowsElement charsetSwitch, string charset) in _charsets)
-                Assert.AreEqual(charsetSwitch.Selected, newPassword.Intersect(charset).Any());
+                Assert.AreEqual(charsetSwitch.Selected, password.Intersect(charset).Any());
         }
     }
 }
