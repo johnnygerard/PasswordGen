@@ -4,7 +4,7 @@ PasswordGen is a UWP application that generates passwords offline.
 
 To install it, visit [Microsoft Store](https://www.microsoft.com/store/apps/9N41PKLFWJNJ).
 
-UI testing is done with [WinAppDriver](https://github.com/microsoft/WinAppDriver).
+UI testing is done with [WinAppDriver](https://github.com/microsoft/WinAppDriver) and MSTest.
 
 Details about the way passwords are generated:
 - A new password is automatically generated at startup.
