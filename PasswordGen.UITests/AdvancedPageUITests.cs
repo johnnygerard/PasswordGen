@@ -7,6 +7,7 @@
 
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text;
     using System.Threading;
     using System.Windows;
 
@@ -53,6 +54,57 @@
             _charsetSwitches = new List<WindowsElement>(_charsets.Select(charset => charset.Item1));
         }
 
+        private string GetRandomString()
+        {
+            int randomLength = _rng.Next(1, 96);
+            var randomString = new StringBuilder(randomLength);
+
+            for (int i = 0; i < randomLength; i++)
+            {
+                char randomChar;
+
+                // Control characters are avoided to simplify the test
+                do randomChar = (char) _rng.Next(256);
+                while (char.IsControl(randomChar));
+                randomString.Append(randomChar);
+            }
+            return randomString.ToString();
+        }
+
+        [TestMethod]
+        public void TestIncludeTextBox()
+        {
+            // Arrange
+            string oldPassword = GetPassword();
+            string randomString = GetRandomString();
+            Clipboard.SetText(randomString, TextDataFormat.UnicodeText);
+            _includeTextBox.Clear();
+
+            // Act
+            _includeTextBox.SendKeys("\uE009v"); // Paste (Ctrl-V)
+
+            // Assert
+            Assert.AreEqual(string.Join(null, randomString.Intersect(_ascii).Except(_excludeTextBox.Text)), _includeTextBox.Text);
+            ValidatePassword(oldPassword);
+        }
+
+        [TestMethod]
+        public void TestExcludeTextBox()
+        {
+            // Arrange
+            string oldPassword = GetPassword();
+            string randomString = GetRandomString();
+            Clipboard.SetText(randomString, TextDataFormat.UnicodeText);
+            _excludeTextBox.Clear();
+
+            // Act
+            _excludeTextBox.SendKeys("\uE009v"); // Paste (Ctrl-V)
+
+            // Assert
+            Assert.AreEqual(string.Join(null, randomString.Intersect(_ascii).Except(_includeTextBox.Text)), _excludeTextBox.Text);
+            ValidatePassword(oldPassword);
+        }
+
         [TestMethod]
         public void TestCopyButton()
         {
@@ -64,6 +116,14 @@
             copyButton.Click();
 
             // Assert
+            if (oldPassword == string.Empty || oldPassword == NULL_CHARSET_MESSAGE)
+            {
+                Assert.IsFalse(copyButton.Enabled);
+                TestLengthSlider(); // Get non zero length
+                _charsetSwitches[_rng.Next(_charsetSwitches.Count)].Click(); // Get non empty charset
+                TestCopyButton(); // Retest
+                return;
+            }
             Assert.AreEqual(oldPassword, GetPassword());
             Assert.AreEqual(oldPassword, Clipboard.GetText());
         }
@@ -88,6 +148,12 @@
             }
 
             // Assert
+            if (int.Parse(_passwordLengthSlider.Text) == 0)
+            {
+                Assert.AreEqual(_passwordTextBlock.Text, string.Empty);
+                TestLengthSlider();
+                return;
+            }
             ValidatePassword(oldPassword);
         }
 
@@ -102,6 +168,14 @@
             refreshButton.Click();
 
             // Assert
+            if (oldPassword == string.Empty || oldPassword == NULL_CHARSET_MESSAGE)
+            {
+                Assert.IsFalse(refreshButton.Enabled);
+                TestLengthSlider(); // Get non zero length
+                _charsetSwitches[_rng.Next(_charsetSwitches.Count)].Click(); // Get non empty charset
+                TestRefreshButton(); // Retest
+                return;
+            }
             ValidatePassword(oldPassword);
         }
 
@@ -115,9 +189,25 @@
                 string oldPassword = GetPassword();
 
                 // Act
-                if (randomCharsetSwitch.Enabled)
-                    randomCharsetSwitch.Click();
-                else continue;
+                randomCharsetSwitch.Click();
+
+                // Assert
+                ValidatePassword(oldPassword);
+            }
+        }
+
+        [TestMethod]
+        public void TestMinNumberBoxes()
+        {
+            for (int i = 0; i < 16; i++)
+            {
+                // Arrange
+                string oldPassword = GetPassword();
+                WindowsElement randomCharsetMin = _charsets[_rng.Next(_charsets.Length)].Item2;
+                if (!randomCharsetMin.Enabled) continue;
+
+                // Act
+                randomCharsetMin.SendKeys($"{_rng.Next(-20, 100)}\uE007"); // \uE007 is the Enter key 
 
                 // Assert
                 ValidatePassword(oldPassword);
@@ -162,16 +252,31 @@
 
         private void ValidatePassword(string oldPassword)
         {
+            Thread.Sleep(10); // Wait for the password to refresh
             string password = GetPassword();
+            bool charsetIsEmpty = true;
 
-            // Validate new password
-            Assert.AreNotEqual(oldPassword, password);
+            // Check empty charset
+            foreach (var (charsetSwitch, _, fullCharset) in _charsets)
+            {
+                IEnumerable<char> charset = charsetSwitch.Selected
+                    ? fullCharset.Except(_excludeTextBox.Text)
+                    : fullCharset.Intersect(_includeTextBox.Text);
 
-            // Validate password length
-            Assert.AreEqual(int.Parse(_passwordLengthSlider.Text), password.Length);
+                if (charset.Any())
+                {
+                    charsetIsEmpty = false;
+                    break;
+                }
+            }
+            if (charsetIsEmpty)
+            {
+                Assert.AreEqual(password, NULL_CHARSET_MESSAGE);
+                return;
+            }
 
             // Validate password character composition
-            foreach ((WindowsElement charsetSwitch, WindowsElement charsetMin, string fullCharset) in _charsets)
+            foreach (var (charsetSwitch, charsetMin, fullCharset) in _charsets)
             {
                 IEnumerable<char> charset = charsetSwitch.Selected
                     ? fullCharset.Except(_excludeTextBox.Text)
@@ -181,6 +286,9 @@
                     Assert.IsTrue(password.Count(passwordChar => charset.Contains(passwordChar)) >= int.Parse(charsetMin.Text));
                 Assert.IsFalse(password.Intersect(fullCharset.Except(charset)).Any());
             }
+
+            // Validate password length
+            Assert.AreEqual(int.Parse(_passwordLengthSlider.Text), password.Length);
         }
 
         /// <summary>
