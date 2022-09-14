@@ -16,4 +16,4 @@ Software made with [Visual Studio](https://visualstudio.microsoft.com)
 Icon made by [bqlqn](https://www.flaticon.com/authors/bqlqn) from [www.flaticon.com](https://www.flaticon.com)
 
 **Copyright**  
-© 2021-2022 Johnny A. F. Gérard
+© 2021-2022 Johnny Gérard
